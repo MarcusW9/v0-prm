@@ -243,7 +243,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
               <TableHead className="w-[300px]">Partner</TableHead>
               <TableHead>Stage</TableHead>
               <TableHead>Priority</TableHead>
-              <TableHead>Health</TableHead>
               <TableHead className="w-[80px]">View</TableHead>
             </TableRow>
           </TableHeader>
@@ -303,9 +302,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                     ) : (
                       <span className="text-sm text-slate-400">—</span>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-slate-400">N/A</span>
                   </TableCell>
                   <TableCell>
                     <Button
