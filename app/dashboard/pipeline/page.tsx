@@ -18,14 +18,12 @@ export default function PipelinePage() {
   return (
     <div className="flex h-full flex-col">
       <div className="border-b bg-white px-6 py-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Pipeline</h1>
-              <p className="text-sm text-slate-500">
-                {pipelineDescriptions[activeView]}
-              </p>
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Pipeline</h1>
+            <p className="text-sm text-slate-500">
+              {pipelineDescriptions[activeView]}
+            </p>
           </div>
           <PipelineToggle activeView={activeView} onViewChange={setActiveView} />
         </div>
