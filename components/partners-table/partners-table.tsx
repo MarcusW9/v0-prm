@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Search, Plus, ExternalLink, Link2, Link2Off } from 'lucide-react'
+import { Search, Plus, ExternalLink } from 'lucide-react'
 import type { Seller, PipelineStage, PriorityLevel } from '@/lib/types/seller'
 import { getStageDefinition, getPriorityColor } from '@/lib/data/pipeline-stages'
 import { cn } from '@/lib/utils'
@@ -243,7 +243,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
               <TableHead className="w-[300px]">Partner</TableHead>
               <TableHead>Stage</TableHead>
               <TableHead>Priority</TableHead>
-              <TableHead>Linked</TableHead>
               <TableHead>Health</TableHead>
               <TableHead className="w-[80px]">View</TableHead>
             </TableRow>
@@ -303,19 +302,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                       </span>
                     ) : (
                       <span className="text-sm text-slate-400">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {seller.mirakiLinked ? (
-                      <div className="flex items-center gap-1.5 text-sm text-emerald-600">
-                        <Link2 className="h-3.5 w-3.5" />
-                        <span>Linked</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 text-sm text-slate-400">
-                        <Link2Off className="h-3.5 w-3.5" />
-                        <span>Not linked</span>
-                      </div>
                     )}
                   </TableCell>
                   <TableCell>
