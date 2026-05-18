@@ -5,8 +5,6 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Users,
-  Upload,
-  UserSearch,
   Columns3,
   UsersRound,
   Settings,
@@ -39,8 +37,6 @@ const navigation = {
   ],
   partnerManagement: [
     { name: 'All Partners', href: '/dashboard/partners', icon: Users },
-    { name: 'Import', href: '/dashboard/import', icon: Upload },
-    { name: 'Prospects', href: '/dashboard/prospects', icon: UserSearch },
     { name: 'Pipeline', href: '/dashboard/pipeline', icon: Columns3 },
   ],
   admin: [
