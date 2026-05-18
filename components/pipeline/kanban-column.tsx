@@ -12,7 +12,7 @@ interface KanbanColumnProps {
 
 export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
   return (
-    <div className="flex w-72 flex-shrink-0 flex-col">
+    <div className="flex w-48 flex-shrink-0 flex-col">
       {/* Column Header */}
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-medium text-slate-700">{stage.label}</h3>
