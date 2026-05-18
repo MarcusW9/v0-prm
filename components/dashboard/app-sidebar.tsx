@@ -8,12 +8,6 @@ import {
   Upload,
   UserSearch,
   Columns3,
-  Rocket,
-  ListTodo,
-  AlertTriangle,
-  Activity,
-  Target,
-  FileText,
   UsersRound,
   Settings,
   ChevronUp,
@@ -48,16 +42,6 @@ const navigation = {
     { name: 'Import', href: '/dashboard/import', icon: Upload },
     { name: 'Prospects', href: '/dashboard/prospects', icon: UserSearch },
     { name: 'Pipeline', href: '/dashboard/pipeline', icon: Columns3 },
-    { name: 'Onboarding', href: '/dashboard/onboarding', icon: Rocket },
-  ],
-  operations: [
-    { name: 'Tasks', href: '/dashboard/tasks', icon: ListTodo },
-    { name: 'Escalations', href: '/dashboard/escalations', icon: AlertTriangle },
-    { name: 'Miraki Status', href: '/dashboard/miraki-status', icon: Activity },
-  ],
-  strategy: [
-    { name: 'Opportunities', href: '/dashboard/opportunities', icon: Target },
-    { name: 'Account Plans', href: '/dashboard/account-plans', icon: FileText },
   ],
   admin: [
     { name: 'Team', href: '/dashboard/team', icon: UsersRound },
@@ -123,60 +107,6 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navigation.partnerManagement.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.href)}
-                    className={cn(
-                      'text-slate-300 hover:bg-slate-700 hover:text-white',
-                      isActive(item.href) && 'bg-slate-700 text-white'
-                    )}
-                  >
-                    <Link href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium uppercase tracking-wider text-slate-500">
-            Operations
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigation.operations.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.href)}
-                    className={cn(
-                      'text-slate-300 hover:bg-slate-700 hover:text-white',
-                      isActive(item.href) && 'bg-slate-700 text-white'
-                    )}
-                  >
-                    <Link href={item.href}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-xs font-medium uppercase tracking-wider text-slate-500">
-            Strategy
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigation.strategy.map((item) => (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton
                     asChild
