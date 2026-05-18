@@ -57,12 +57,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
-      <SidebarHeader className="bg-slate-800 px-4 py-4">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-500">
+      <SidebarHeader className="bg-slate-800 px-2 py-4">
+        <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-orange-500">
             <span className="text-sm font-bold text-white">A</span>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold text-white">Argos</span>
             <span className="text-xs text-slate-400">Partner Hub</span>
           </div>
@@ -154,17 +154,17 @@ export function AppSidebar() {
       <SidebarFooter className="bg-slate-800 p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-3 rounded-md p-2 text-left hover:bg-slate-700">
-              <Avatar className="h-8 w-8 bg-teal-600">
+            <button className="flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left hover:bg-slate-700">
+              <Avatar className="h-8 w-8 flex-shrink-0 bg-teal-600">
                 <AvatarFallback className="bg-teal-600 text-xs text-white">
                   T
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-1 flex-col">
+              <div className="flex flex-1 flex-col overflow-hidden group-data-[collapsible=icon]:hidden">
                 <span className="text-sm font-medium text-white">test</span>
                 <span className="text-xs text-slate-400">admin</span>
               </div>
-              <ChevronUp className="h-4 w-4 text-slate-400" />
+              <ChevronUp className="h-4 w-4 text-slate-400 group-data-[collapsible=icon]:hidden" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
