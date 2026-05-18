@@ -5,7 +5,6 @@ import type { Seller, PipelineType, PriorityLevel } from '@/lib/types/seller'
 import { getPipelineStages } from '@/lib/data/pipeline-stages'
 import { KanbanColumn } from './kanban-column'
 import { PipelineFilters } from './pipeline-filters'
-import { PartnerSheet } from '@/components/partner/partner-sheet'
 
 interface KanbanBoardProps {
   sellers: Seller[]
@@ -13,8 +12,6 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ sellers, pipelineType }: KanbanBoardProps) {
-  const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null)
-  const [sheetOpen, setSheetOpen] = useState(false)
   const [samManagerFilter, setSamManagerFilter] = useState<string>('all')
   const [priorityFilter, setPriorityFilter] = useState<PriorityLevel | 'all'>('all')
 
@@ -58,11 +55,6 @@ export function KanbanBoard({ sellers, pipelineType }: KanbanBoardProps) {
 
   const totalCount = filteredSellers.length
 
-  const handleCardClick = (seller: Seller) => {
-    setSelectedSeller(seller)
-    setSheetOpen(true)
-  }
-
   return (
     <div className="flex h-full flex-col">
       {/* Stage Progress Bar */}
@@ -94,17 +86,9 @@ export function KanbanBoard({ sellers, pipelineType }: KanbanBoardProps) {
             key={stage.id}
             stage={stage}
             sellers={sellersByStage[stage.id] || []}
-            onCardClick={handleCardClick}
           />
         ))}
       </div>
-
-      {/* Partner Detail Sheet */}
-      <PartnerSheet
-        seller={selectedSeller}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
     </div>
   )
 }

@@ -1,21 +1,21 @@
 'use client'
 
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import type { Seller } from '@/lib/types/seller'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
 
 interface KanbanCardProps {
   seller: Seller
-  onClick: () => void
 }
 
-export function KanbanCard({ seller, onClick }: KanbanCardProps) {
+export function KanbanCard({ seller }: KanbanCardProps) {
   const priorityColors = getPriorityColor(seller.priorityScore)
 
   return (
-    <button
-      onClick={onClick}
-      className="w-full rounded-md border bg-white px-3 py-2 text-left shadow-sm transition-shadow hover:shadow-md"
+    <Link
+      href={`/dashboard/partners/${seller.id}`}
+      className="block w-full rounded-md border bg-white px-3 py-2 text-left shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-2">
         <h4 className="truncate text-sm font-medium text-slate-900">
@@ -33,6 +33,6 @@ export function KanbanCard({ seller, onClick }: KanbanCardProps) {
           </span>
         )}
       </div>
-    </button>
+    </Link>
   )
 }

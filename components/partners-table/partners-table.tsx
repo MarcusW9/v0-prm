@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { Search, Plus, ExternalLink, Link2, Link2Off } from 'lucide-react'
 import type { Seller, PipelineStage, PriorityLevel } from '@/lib/types/seller'
 import { getStageDefinition, getPriorityColor } from '@/lib/data/pipeline-stages'
@@ -24,7 +25,6 @@ import {
 } from '@/components/ui/table'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { PartnerSheet } from '@/components/partner/partner-sheet'
 
 interface PartnersTableProps {
   sellers: Seller[]
@@ -55,8 +55,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [priorityFilters, setPriorityFilters] = useState<(PriorityLevel | 'all')[]>([])
   const [pipelineFilters, setPipelineFilters] = useState<(PipelineStage | 'all')[]>([])
-  const [selectedSeller, setSelectedSeller] = useState<Seller | null>(null)
-  const [sheetOpen, setSheetOpen] = useState(false)
 
   const togglePriorityFilter = (priority: PriorityLevel | 'all') => {
     setPriorityFilters((prev) =>
@@ -134,11 +132,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
       .join('')
       .toUpperCase()
       .slice(0, 2)
-  }
-
-  const handleRowClick = (seller: Seller) => {
-    setSelectedSeller(seller)
-    setSheetOpen(true)
   }
 
   return (
@@ -250,7 +243,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
               <TableHead className="w-[300px]">Partner</TableHead>
               <TableHead>Stage</TableHead>
               <TableHead>Priority</TableHead>
-              <TableHead>Miraki</TableHead>
+              <TableHead>Linked</TableHead>
               <TableHead>Health</TableHead>
               <TableHead className="w-[80px]">View</TableHead>
             </TableRow>
@@ -264,10 +257,9 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                 <TableRow
                   key={seller.id}
                   className="cursor-pointer hover:bg-slate-50"
-                  onClick={() => handleRowClick(seller)}
                 >
                   <TableCell>
-                    <div className="flex items-center gap-3">
+                    <Link href={`/dashboard/partners/${seller.id}`} className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 bg-slate-200">
                         <AvatarFallback className="text-xs font-medium">
                           {getInitials(seller.companyName)}
@@ -281,7 +273,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                           {seller.contactName}
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   </TableCell>
                   <TableCell>
                     {stageDefinition && (
@@ -334,12 +326,11 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleRowClick(seller)
-                      }}
+                      asChild
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <Link href={`/dashboard/partners/${seller.id}`}>
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -348,13 +339,6 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
           </TableBody>
         </Table>
       </div>
-
-      {/* Partner Detail Sheet */}
-      <PartnerSheet
-        seller={selectedSeller}
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-      />
     </div>
   )
 }

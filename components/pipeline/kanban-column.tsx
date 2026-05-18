@@ -8,10 +8,9 @@ import { KanbanCard } from './kanban-card'
 interface KanbanColumnProps {
   stage: StageDefinition
   sellers: Seller[]
-  onCardClick: (seller: Seller) => void
 }
 
-export function KanbanColumn({ stage, sellers, onCardClick }: KanbanColumnProps) {
+export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
   return (
     <div className="flex w-72 flex-shrink-0 flex-col">
       {/* Column Header */}
@@ -35,11 +34,7 @@ export function KanbanColumn({ stage, sellers, onCardClick }: KanbanColumnProps)
           </div>
         ) : (
           sellers.map((seller) => (
-            <KanbanCard
-              key={seller.id}
-              seller={seller}
-              onClick={() => onCardClick(seller)}
-            />
+            <KanbanCard key={seller.id} seller={seller} />
           ))
         )}
       </div>
