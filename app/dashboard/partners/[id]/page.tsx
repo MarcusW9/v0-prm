@@ -339,6 +339,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               <CardContent>
                 <StageChecklists
                   currentStage={currentStage}
+                  currentPipeline={seller.pipeline}
                   checklistProgress={checklistProgress}
                   onItemChange={handleChecklistItemChange}
                 />

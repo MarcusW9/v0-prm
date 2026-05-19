@@ -17,12 +17,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import type { AcquisitionStage, ChecklistItemCompletion } from '@/lib/types/seller'
-import type { StageChecklist, ChecklistItem } from '@/lib/data/stage-checklists'
-import { acquisitionChecklists } from '@/lib/data/stage-checklists'
+import type { PipelineStage, PipelineType, ChecklistItemCompletion } from '@/lib/types/seller'
+import type { StageChecklist, ChecklistItem, PipelineChecklists } from '@/lib/data/stage-checklists'
+import { allPipelineChecklists, getPipelineForStage } from '@/lib/data/stage-checklists'
 
 interface StageChecklistProps {
-  currentStage: AcquisitionStage
+  currentStage: PipelineStage
+  currentPipeline: PipelineType
   checklistProgress: Record<string, ChecklistItemCompletion>
   onItemChange: (itemId: string, completed: boolean, value?: string) => void
 }
@@ -140,29 +141,28 @@ function ChecklistItemRow({
 function StageSection({
   checklist,
   currentStage,
+  currentPipeline,
+  pipelineId,
+  stageOrder,
   checklistProgress,
   onItemChange,
 }: {
   checklist: StageChecklist
-  currentStage: AcquisitionStage
+  currentStage: PipelineStage
+  currentPipeline: PipelineType
+  pipelineId: PipelineType
+  stageOrder: PipelineStage[]
   checklistProgress: Record<string, ChecklistItemCompletion>
   onItemChange: (itemId: string, completed: boolean, value?: string) => void
 }) {
-  const isCurrentStage = checklist.stageId === currentStage
+  const isCurrentPipeline = pipelineId === currentPipeline
+  const isCurrentStage = checklist.stageId === currentStage && isCurrentPipeline
   const [isOpen, setIsOpen] = useState(isCurrentStage)
 
-  const stageOrder: AcquisitionStage[] = [
-    'identified',
-    'prospecting',
-    'pitched',
-    'vetting',
-    'compliance',
-    'signoff',
-  ]
   const currentIndex = stageOrder.indexOf(currentStage)
-  const stageIndex = stageOrder.indexOf(checklist.stageId)
-  const isPastStage = stageIndex < currentIndex
-  const isFutureStage = stageIndex > currentIndex
+  const stageIndex = stageOrder.indexOf(checklist.stageId as PipelineStage)
+  const isPastStage = isCurrentPipeline && stageIndex < currentIndex && stageIndex !== -1
+  const isFutureStage = isCurrentPipeline && stageIndex > currentIndex
 
   // Count completed items
   const completedCount = checklist.items.filter(
@@ -187,7 +187,7 @@ function StageSection({
             isPastStage && allComplete && 'border-emerald-500 bg-emerald-500',
             isPastStage && !allComplete && 'border-amber-500 bg-amber-500',
             isCurrentStage && 'border-blue-500 bg-blue-50',
-            isFutureStage && 'border-slate-300 bg-slate-50'
+            (isFutureStage || !isCurrentPipeline) && 'border-slate-300 bg-slate-50'
           )}
         >
           {(isPastStage && allComplete) ? (
@@ -208,7 +208,7 @@ function StageSection({
             className={cn(
               'text-sm font-medium',
               isCurrentStage && 'text-blue-700',
-              isFutureStage && 'text-muted-foreground'
+              (isFutureStage || !isCurrentPipeline) && 'text-muted-foreground'
             )}
           >
             {checklist.stageLabel}
@@ -234,18 +234,98 @@ function StageSection({
   )
 }
 
+function PipelineSection({
+  pipeline,
+  currentStage,
+  currentPipeline,
+  checklistProgress,
+  onItemChange,
+}: {
+  pipeline: PipelineChecklists
+  currentStage: PipelineStage
+  currentPipeline: PipelineType
+  checklistProgress: Record<string, ChecklistItemCompletion>
+  onItemChange: (itemId: string, completed: boolean, value?: string) => void
+}) {
+  const isCurrentPipeline = pipeline.pipelineId === currentPipeline
+  const [isOpen, setIsOpen] = useState(isCurrentPipeline)
+
+  const stageOrder = pipeline.stages.map(s => s.stageId)
+
+  // Calculate pipeline progress
+  const totalItems = pipeline.stages.reduce((acc, stage) => acc + stage.items.length, 0)
+  const completedItems = pipeline.stages.reduce((acc, stage) => {
+    return acc + stage.items.filter(item => checklistProgress[item.id]?.completed).length
+  }, 0)
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger className={cn(
+        "flex w-full items-center gap-3 rounded-lg p-4 transition-colors",
+        isCurrentPipeline 
+          ? "bg-blue-50 border-2 border-blue-200 hover:bg-blue-100" 
+          : "bg-slate-50 border border-slate-200 hover:bg-slate-100"
+      )}>
+        <div className="flex items-center justify-center">
+          {isOpen ? (
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+          ) : (
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          )}
+        </div>
+        <div className="flex flex-1 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={cn(
+              "text-base font-semibold",
+              isCurrentPipeline ? "text-blue-700" : "text-slate-700"
+            )}>
+              {pipeline.pipelineLabel}
+            </span>
+            {isCurrentPipeline && (
+              <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+                Current
+              </span>
+            )}
+          </div>
+          <span className="text-sm text-muted-foreground">
+            {completedItems}/{totalItems} items
+          </span>
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="mt-2 space-y-2 pl-4">
+          {pipeline.stages.map((checklist) => (
+            <StageSection
+              key={checklist.stageId}
+              checklist={checklist}
+              currentStage={currentStage}
+              currentPipeline={currentPipeline}
+              pipelineId={pipeline.pipelineId}
+              stageOrder={stageOrder}
+              checklistProgress={checklistProgress}
+              onItemChange={onItemChange}
+            />
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
+
 export function StageChecklists({
   currentStage,
+  currentPipeline,
   checklistProgress,
   onItemChange,
 }: StageChecklistProps) {
   return (
-    <div className="space-y-2">
-      {acquisitionChecklists.map((checklist) => (
-        <StageSection
-          key={checklist.stageId}
-          checklist={checklist}
+    <div className="space-y-4">
+      {allPipelineChecklists.map((pipeline) => (
+        <PipelineSection
+          key={pipeline.pipelineId}
+          pipeline={pipeline}
           currentStage={currentStage}
+          currentPipeline={currentPipeline}
           checklistProgress={checklistProgress}
           onItemChange={onItemChange}
         />

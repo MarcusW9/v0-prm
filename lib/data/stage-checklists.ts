@@ -1,4 +1,4 @@
-import type { AcquisitionStage } from '@/lib/types/seller'
+import type { AcquisitionStage, OnboardingStage, AccountManagementStage, PipelineStage } from '@/lib/types/seller'
 
 export interface ChecklistItem {
   id: string
@@ -9,9 +9,15 @@ export interface ChecklistItem {
 }
 
 export interface StageChecklist {
-  stageId: AcquisitionStage
+  stageId: PipelineStage
   stageLabel: string
   items: ChecklistItem[]
+}
+
+export interface PipelineChecklists {
+  pipelineId: 'acquisition' | 'onboarding' | 'account-management'
+  pipelineLabel: string
+  stages: StageChecklist[]
 }
 
 export const acquisitionChecklists: StageChecklist[] = [
@@ -78,10 +84,130 @@ export const acquisitionChecklists: StageChecklist[] = [
   },
 ]
 
-export function getChecklistForStage(stageId: AcquisitionStage): StageChecklist | undefined {
-  return acquisitionChecklists.find((checklist) => checklist.stageId === stageId)
+export const onboardingChecklists: StageChecklist[] = [
+  {
+    stageId: 'shop-created',
+    stageLabel: 'Shop Created',
+    items: [
+      { id: 'shop-registered', label: 'Shop registration completed', type: 'checkbox' },
+      { id: 'seller-credentials-sent', label: 'Seller credentials sent', type: 'checkbox' },
+      { id: 'welcome-call-scheduled', label: 'Welcome call scheduled', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'initial-qc-pass',
+    stageLabel: 'Initial QC Pass',
+    items: [
+      { id: 'product-data-reviewed', label: 'Product data reviewed', type: 'checkbox' },
+      { id: 'imagery-approved', label: 'Imagery approved', type: 'checkbox' },
+      { id: 'pricing-validated', label: 'Pricing validated', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'qc-reject',
+    stageLabel: 'QC Reject',
+    items: [
+      { id: 'rejection-feedback-sent', label: 'Rejection feedback sent', type: 'checkbox' },
+      { id: 'corrections-received', label: 'Corrections received', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'launch-upload',
+    stageLabel: 'Launch Upload',
+    items: [
+      { id: 'products-uploaded', label: 'Products uploaded to platform', type: 'checkbox' },
+      { id: 'inventory-synced', label: 'Inventory synced', type: 'checkbox' },
+      { id: 'launch-date-confirmed', label: 'Launch date confirmed', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'sign-off',
+    stageLabel: 'Sign Off',
+    items: [
+      { id: 'final-review-complete', label: 'Final review complete', type: 'checkbox' },
+      { id: 'go-live-approval', label: 'Go-live approval', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'hypercare',
+    stageLabel: 'Hypercare',
+    items: [
+      { id: 'first-week-checkin', label: 'First week check-in completed', type: 'checkbox' },
+      { id: 'issues-resolved', label: 'Launch issues resolved', type: 'checkbox' },
+      { id: 'hypercare-complete', label: 'Hypercare period complete', type: 'checkbox' },
+    ],
+  },
+]
+
+export const accountManagementChecklists: StageChecklist[] = [
+  {
+    stageId: 'stabilisation',
+    stageLabel: 'Stabilisation',
+    items: [
+      { id: 'performance-baseline', label: 'Performance baseline established', type: 'checkbox' },
+      { id: 'regular-cadence-set', label: 'Regular meeting cadence set', type: 'checkbox' },
+      { id: 'kpis-agreed', label: 'KPIs agreed', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'growing',
+    stageLabel: 'Growing',
+    items: [
+      { id: 'growth-plan-created', label: 'Growth plan created', type: 'checkbox' },
+      { id: 'promotional-calendar', label: 'Promotional calendar agreed', type: 'checkbox' },
+      { id: 'range-expansion', label: 'Range expansion opportunities identified', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'strategic',
+    stageLabel: 'Strategic',
+    items: [
+      { id: 'strategic-review', label: 'Strategic partnership review completed', type: 'checkbox' },
+      { id: 'joint-business-plan', label: 'Joint business plan agreed', type: 'checkbox' },
+      { id: 'exclusive-opportunities', label: 'Exclusive opportunities discussed', type: 'checkbox' },
+    ],
+  },
+  {
+    stageId: 'performance-intervention',
+    stageLabel: 'Performance Intervention',
+    items: [
+      { id: 'performance-issues-identified', label: 'Performance issues identified', type: 'checkbox' },
+      { id: 'improvement-plan-created', label: 'Improvement plan created', type: 'checkbox' },
+      { id: 'review-meeting-scheduled', label: 'Review meeting scheduled', type: 'checkbox' },
+    ],
+  },
+]
+
+export const allPipelineChecklists: PipelineChecklists[] = [
+  {
+    pipelineId: 'acquisition',
+    pipelineLabel: 'Acquisition',
+    stages: acquisitionChecklists,
+  },
+  {
+    pipelineId: 'onboarding',
+    pipelineLabel: 'Onboarding',
+    stages: onboardingChecklists,
+  },
+  {
+    pipelineId: 'account-management',
+    pipelineLabel: 'Account Management',
+    stages: accountManagementChecklists,
+  },
+]
+
+export function getChecklistForStage(stageId: PipelineStage): StageChecklist | undefined {
+  const allStages = [...acquisitionChecklists, ...onboardingChecklists, ...accountManagementChecklists]
+  return allStages.find((checklist) => checklist.stageId === stageId)
 }
 
 export function getAllChecklists(): StageChecklist[] {
-  return acquisitionChecklists
+  return [...acquisitionChecklists, ...onboardingChecklists, ...accountManagementChecklists]
+}
+
+export function getPipelineForStage(stageId: PipelineStage): 'acquisition' | 'onboarding' | 'account-management' | undefined {
+  if (acquisitionChecklists.some(c => c.stageId === stageId)) return 'acquisition'
+  if (onboardingChecklists.some(c => c.stageId === stageId)) return 'onboarding'
+  if (accountManagementChecklists.some(c => c.stageId === stageId)) return 'account-management'
+  return undefined
 }
