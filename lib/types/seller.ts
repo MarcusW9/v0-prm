@@ -26,6 +26,21 @@ export type PipelineStage = AcquisitionStage | OnboardingStage | AccountManageme
 
 export type PipelineType = 'acquisition' | 'onboarding' | 'account-management'
 
+// Checklist completion tracking
+export interface ChecklistItemCompletion {
+  itemId: string
+  completed: boolean
+  value?: string // For dropdown, text, or currency types
+  completedAt?: Date
+  completedBy?: string
+}
+
+export interface StageChecklistCompletion {
+  stageId: PipelineStage
+  enteredAt: Date
+  items: ChecklistItemCompletion[]
+}
+
 export interface Seller {
   id: string
   companyName: string
@@ -45,6 +60,7 @@ export interface Seller {
   healthStatus: 'healthy' | 'at-risk' | 'critical' | null
   createdAt: Date
   updatedAt: Date
+  checklistProgress?: StageChecklistCompletion[] // Track completion per stage
 }
 
 export interface Note {

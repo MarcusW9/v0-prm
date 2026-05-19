@@ -3,8 +3,9 @@
 import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { mockSellers, mockNotes, mockFiles } from '@/lib/data/mock-sellers'
-import { getStageDefinition } from '@/lib/data/pipeline-stages'
+import { getStageDefinition, acquisitionStages } from '@/lib/data/pipeline-stages'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
+import { getChecklistForStage } from '@/lib/data/stage-checklists'
 import { ArrowLeft, User, Mail, Building2, Calendar, CheckCircle2, XCircle, Upload, FileText, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -22,6 +23,9 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { StageChecklists, hasIncompleteItems } from '@/components/partner/stage-checklists'
+import { IncompleteChecklistDialog } from '@/components/partner/incomplete-checklist-dialog'
+import type { AcquisitionStage, ChecklistItemCompletion } from '@/lib/types/seller'
 
 interface PartnerDetailPageProps {
   params: Promise<{ id: string }>
@@ -32,8 +36,20 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const [newNote, setNewNote] = useState('')
-
+  
+  // Find seller
   const seller = mockSellers.find((s) => s.id === id)
+  
+  // Checklist state
+  const [checklistProgress, setChecklistProgress] = useState<Record<string, ChecklistItemCompletion>>({})
+  const [currentStage, setCurrentStage] = useState<AcquisitionStage>(
+    (seller?.stage as AcquisitionStage) || 'identified'
+  )
+  
+  // Dialog state for incomplete checklist warning
+  const [showIncompleteDialog, setShowIncompleteDialog] = useState(false)
+  const [pendingStageChange, setPendingStageChange] = useState<AcquisitionStage | null>(null)
+  const [incompleteItems, setIncompleteItems] = useState<string[]>([])
   
   if (!seller) {
     return (
@@ -43,7 +59,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
     )
   }
 
-  const stageDefinition = getStageDefinition(seller.stage)
+  const stageDefinition = getStageDefinition(currentStage)
   const priorityColors = getPriorityColor(seller.priorityScore)
   const sellerNotes = mockNotes.filter((note) => note.sellerId === seller.id)
   const sellerFiles = mockFiles.filter((file) => file.sellerId === seller.id)
@@ -88,6 +104,49 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
     setNewNote('')
   }
 
+  const handleChecklistItemChange = (itemId: string, completed: boolean, value?: string) => {
+    setChecklistProgress((prev) => ({
+      ...prev,
+      [itemId]: {
+        itemId,
+        completed,
+        value,
+        completedAt: completed ? new Date() : undefined,
+        completedBy: 'Current User',
+      },
+    }))
+  }
+
+  const handleStageChange = (newStage: AcquisitionStage) => {
+    // Check if current stage has incomplete items
+    const currentChecklist = getChecklistForStage(currentStage)
+    if (currentChecklist) {
+      const missing = hasIncompleteItems(currentChecklist, checklistProgress)
+      if (missing.length > 0) {
+        setIncompleteItems(missing)
+        setPendingStageChange(newStage)
+        setShowIncompleteDialog(true)
+        return
+      }
+    }
+    
+    // No incomplete items, proceed with stage change
+    completeStageChange(newStage)
+  }
+
+  const completeStageChange = (newStage: AcquisitionStage) => {
+    setCurrentStage(newStage)
+    toast.success(`Moved to ${getStageDefinition(newStage)?.label || newStage}`)
+  }
+
+  const handleConfirmIncompleteMove = () => {
+    if (pendingStageChange) {
+      completeStageChange(pendingStageChange)
+      setPendingStageChange(null)
+    }
+    setShowIncompleteDialog(false)
+  }
+
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
@@ -119,14 +178,28 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </span>
               )}
             </div>
-            {stageDefinition && (
-              <Badge
-                variant="secondary"
-                className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0')}
-              >
-                {stageDefinition.label}
-              </Badge>
-            )}
+            <div className="flex items-center gap-3">
+              <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
+                <SelectTrigger className="w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {acquisitionStages.map((stage) => (
+                    <SelectItem key={stage.id} value={stage.id}>
+                      {stage.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {stageDefinition && (
+                <Badge
+                  variant="secondary"
+                  className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0')}
+                >
+                  {stageDefinition.label}
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -136,6 +209,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="checklist">Checklist</TabsTrigger>
             <TabsTrigger value="notes">
               Notes {sellerNotes.length > 0 && `(${sellerNotes.length})`}
             </TabsTrigger>
@@ -254,6 +328,24 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
             </div>
           </TabsContent>
 
+          <TabsContent value="checklist" className="mt-0">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Pipeline Progress</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Complete the checklist items as you progress through each stage
+                </p>
+              </CardHeader>
+              <CardContent>
+                <StageChecklists
+                  currentStage={currentStage}
+                  checklistProgress={checklistProgress}
+                  onItemChange={handleChecklistItemChange}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="notes" className="mt-0">
             <Card>
               <CardContent className="pt-6">
@@ -351,6 +443,16 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Incomplete Checklist Dialog */}
+      <IncompleteChecklistDialog
+        open={showIncompleteDialog}
+        onOpenChange={setShowIncompleteDialog}
+        incompleteItems={incompleteItems}
+        fromStage={getStageDefinition(currentStage)?.label || currentStage}
+        toStage={pendingStageChange ? (getStageDefinition(pendingStageChange)?.label || pendingStageChange) : ''}
+        onConfirm={handleConfirmIncompleteMove}
+      />
     </div>
   )
 }
