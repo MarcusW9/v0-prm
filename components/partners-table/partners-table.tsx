@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, Plus, ExternalLink } from 'lucide-react'
 import type { Seller, PipelineStage, PriorityLevel } from '@/lib/types/seller'
-import { getStageDefinition, getPriorityColor } from '@/lib/data/pipeline-stages'
+import { getStageDefinition, getPriorityColor, acquisitionStages, onboardingStages, accountManagementStages } from '@/lib/data/pipeline-stages'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -38,15 +38,7 @@ const priorityOptions: { value: PriorityLevel | 'all'; label: string }[] = [
   { value: 'no-score', label: 'No Score' },
 ]
 
-const pipelineStageOptions: { value: PipelineStage | 'all'; label: string }[] = [
-  { value: 'initial-contact', label: 'Initial Contact' },
-  { value: 'recruiting', label: 'Recruiting' },
-  { value: 'unresponsive', label: 'Unresponsive' },
-  { value: 'handed-off', label: 'Handed Off' },
-  { value: 'on-hold', label: 'On Hold' },
-  { value: 'pending-approval', label: 'Pending Approval' },
-  { value: 'approved', label: 'Approved' },
-]
+const allStages = [...acquisitionStages, ...onboardingStages, ...accountManagementStages]
 
 export function PartnersTable({ sellers }: PartnersTableProps) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -168,9 +160,9 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All stages</SelectItem>
-            {pipelineStageOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
+            {allStages.map((stage) => (
+              <SelectItem key={stage.id} value={stage.id}>
+                {stage.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -219,18 +211,18 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
       {/* Filters Row 3 - Pipeline */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm text-slate-500">Pipeline:</span>
-        {pipelineStageOptions.map((option) => (
+        {allStages.map((stage) => (
           <button
-            key={option.value}
-            onClick={() => togglePipelineFilter(option.value as PipelineStage)}
+            key={stage.id}
+            onClick={() => togglePipelineFilter(stage.id as PipelineStage)}
             className={cn(
               'rounded-md border px-2.5 py-1 text-xs font-medium transition-all',
-              pipelineFilters.includes(option.value as PipelineStage)
+              pipelineFilters.includes(stage.id as PipelineStage)
                 ? 'border-slate-900 bg-slate-900 text-white'
                 : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
             )}
           >
-            {option.label}
+            {stage.label}
           </button>
         ))}
       </div>

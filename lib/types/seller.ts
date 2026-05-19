@@ -1,13 +1,12 @@
 export type PriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'no-score'
 
 export type AcquisitionStage =
-  | 'initial-contact'
-  | 'recruiting'
-  | 'unresponsive'
-  | 'handed-off'
-  | 'on-hold'
-  | 'pending-approval'
-  | 'approved'
+  | 'identified'
+  | 'prospecting'
+  | 'pitched'
+  | 'vetting'
+  | 'compliance'
+  | 'signoff'
 
 export type OnboardingStage =
   | 'shop-created'
