@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import type { Seller } from '@/lib/types/seller'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
@@ -12,15 +14,45 @@ interface KanbanCardProps {
 export function KanbanCard({ seller }: KanbanCardProps) {
   const priorityColors = getPriorityColor(seller.priorityScore)
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: seller.id,
+    data: {
+      type: 'card',
+      seller,
+    },
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
   return (
-    <Link
-      href={`/dashboard/partners/${seller.id}`}
-      className="block w-full rounded-md border bg-white px-3 py-2 text-left shadow-sm transition-shadow hover:shadow-md"
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        'block w-full cursor-grab rounded-md border bg-white px-3 py-2 text-left shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing',
+        isDragging && 'opacity-50 shadow-lg'
+      )}
     >
       <div className="flex items-center justify-between gap-2">
-        <h4 className="truncate text-sm font-medium text-slate-900">
+        <Link
+          href={`/dashboard/partners/${seller.id}`}
+          className="truncate text-sm font-medium text-slate-900 hover:underline"
+          onClick={(e) => e.stopPropagation()}
+        >
           {seller.companyName}
-        </h4>
+        </Link>
         {seller.priorityScore !== null && (
           <span
             className={cn(
@@ -33,6 +65,6 @@ export function KanbanCard({ seller }: KanbanCardProps) {
           </span>
         )}
       </div>
-    </Link>
+    </div>
   )
 }

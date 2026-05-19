@@ -1,5 +1,7 @@
 'use client'
 
+import { useDroppable } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { cn } from '@/lib/utils'
 import type { Seller } from '@/lib/types/seller'
 import type { StageDefinition } from '@/lib/types/seller'
@@ -11,6 +13,16 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: stage.id,
+    data: {
+      type: 'column',
+      stage,
+    },
+  })
+
+  const sellerIds = sellers.map((s) => s.id)
+
   return (
     <div className="flex w-48 flex-shrink-0 flex-col">
       {/* Column Header */}
@@ -23,20 +35,24 @@ export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
 
       {/* Column Content */}
       <div
+        ref={setNodeRef}
         className={cn(
-          'flex flex-1 flex-col gap-3 rounded-lg p-3',
-          stage.bgColor
+          'flex flex-1 flex-col gap-3 rounded-lg p-3 transition-colors',
+          stage.bgColor,
+          isOver && 'ring-2 ring-inset ring-blue-400'
         )}
       >
-        {sellers.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center py-8">
-            <span className="text-sm text-slate-400">Drop here</span>
-          </div>
-        ) : (
-          sellers.map((seller) => (
-            <KanbanCard key={seller.id} seller={seller} />
-          ))
-        )}
+        <SortableContext items={sellerIds} strategy={verticalListSortingStrategy}>
+          {sellers.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center py-8">
+              <span className="text-sm text-slate-400">Drop here</span>
+            </div>
+          ) : (
+            sellers.map((seller) => (
+              <KanbanCard key={seller.id} seller={seller} />
+            ))
+          )}
+        </SortableContext>
       </div>
     </div>
   )
