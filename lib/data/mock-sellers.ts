@@ -1,7 +1,7 @@
 import type { Seller, Note, SellerFile } from '@/lib/types/seller'
 
 export const mockSellers: Seller[] = [
-  // Acquisition Pipeline - Initial Contact
+  // Acquisition Pipeline - Identified
   {
     id: '1',
     companyName: 'Jessica Alderson',
@@ -10,7 +10,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'jess@kopadot.co.uk',
     priorityScore: null,
     pipeline: 'acquisition',
-    stage: 'initial-contact',
+    stage: 'identified',
     samManager: 'Sarah Johnson',
     daysIdle: 1,
     gmvPotential: null,
@@ -22,7 +22,7 @@ export const mockSellers: Seller[] = [
     createdAt: new Date('2026-05-11'),
     updatedAt: new Date('2026-05-17'),
   },
-  // Acquisition Pipeline - Recruiting
+  // Acquisition Pipeline - Prospecting
   {
     id: '2',
     companyName: 'Wallplus Ltd',
@@ -31,7 +31,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'keith@wallplus.co.uk',
     priorityScore: 3.9,
     pipeline: 'acquisition',
-    stage: 'recruiting',
+    stage: 'prospecting',
     samManager: 'Sarah Johnson',
     daysIdle: 1,
     gmvPotential: 'high',
@@ -51,7 +51,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'rajhanda@homediscount.co.uk',
     priorityScore: 2.8,
     pipeline: 'acquisition',
-    stage: 'recruiting',
+    stage: 'pitched',
     samManager: 'Mike Thompson',
     daysIdle: 1,
     gmvPotential: 'medium',
@@ -71,7 +71,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'aozgul@themia.co.uk',
     priorityScore: 2.7,
     pipeline: 'acquisition',
-    stage: 'recruiting',
+    stage: 'vetting',
     samManager: 'Sarah Johnson',
     daysIdle: 1,
     gmvPotential: 'medium',
@@ -83,7 +83,7 @@ export const mockSellers: Seller[] = [
     createdAt: new Date('2026-05-08'),
     updatedAt: new Date('2026-05-17'),
   },
-  // Acquisition Pipeline - Handed Off
+  // Acquisition Pipeline - Compliance
   {
     id: '5',
     companyName: 'Select International Products',
@@ -92,7 +92,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'sarah.sales@selectip.co.uk',
     priorityScore: 3.7,
     pipeline: 'acquisition',
-    stage: 'handed-off',
+    stage: 'compliance',
     samManager: 'Mike Thompson',
     daysIdle: 14,
     gmvPotential: 'high',
@@ -104,7 +104,7 @@ export const mockSellers: Seller[] = [
     createdAt: new Date('2026-05-04'),
     updatedAt: new Date('2026-05-04'),
   },
-  // Acquisition Pipeline - Pending Approval
+  // Acquisition Pipeline - Signoff
   {
     id: '6',
     companyName: 'Trimetals Ltd',
@@ -113,7 +113,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 't.smith@trimetals.co.uk',
     priorityScore: 2.4,
     pipeline: 'acquisition',
-    stage: 'pending-approval',
+    stage: 'signoff',
     samManager: 'Sarah Johnson',
     daysIdle: 14,
     gmvPotential: 'medium',
@@ -133,7 +133,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'contact@example.com',
     priorityScore: null,
     pipeline: 'acquisition',
-    stage: 'pending-approval',
+    stage: 'signoff',
     samManager: 'Mike Thompson',
     daysIdle: 1,
     gmvPotential: null,
@@ -214,7 +214,7 @@ export const mockSellers: Seller[] = [
     contactEmail: 'pauline@muchv.co.uk',
     priorityScore: null,
     pipeline: 'acquisition',
-    stage: 'recruiting',
+    stage: 'prospecting',
     samManager: 'Mike Thompson',
     daysIdle: 2,
     gmvPotential: null,
