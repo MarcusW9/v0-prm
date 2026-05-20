@@ -24,11 +24,18 @@ export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
   const sellerIds = sellers.map((s) => s.id)
 
   return (
-    <div className="flex w-48 flex-shrink-0 flex-col">
+    <div className={cn(
+      "flex w-48 flex-shrink-0 flex-col rounded-lg",
+      stage.bgColor
+    )}>
       {/* Column Header */}
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-700">{stage.label}</h3>
-        <span className="flex h-5 min-w-5 items-center justify-center rounded bg-slate-200 px-1.5 text-xs font-medium text-slate-600">
+      <div className="flex items-center justify-between px-3 pt-3 pb-2">
+        <h3 className={cn("text-sm font-medium", stage.color)}>{stage.label}</h3>
+        <span className={cn(
+          "flex h-5 min-w-5 items-center justify-center rounded px-1.5 text-xs font-medium",
+          "bg-white/60",
+          stage.color
+        )}>
           {sellers.length}
         </span>
       </div>
@@ -37,9 +44,8 @@ export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
       <div
         ref={setNodeRef}
         className={cn(
-          'flex flex-1 flex-col gap-3 rounded-lg p-3 transition-colors',
-          stage.bgColor,
-          isOver && 'ring-2 ring-inset ring-blue-400'
+          'flex flex-1 flex-col gap-3 px-3 pb-3 transition-colors',
+          isOver && 'ring-2 ring-inset ring-blue-400 rounded-b-lg'
         )}
       >
         <SortableContext items={sellerIds} strategy={verticalListSortingStrategy}>
