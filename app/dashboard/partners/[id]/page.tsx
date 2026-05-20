@@ -2,7 +2,7 @@
 
 import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { mockSellers, mockNotes, mockFiles } from '@/lib/data/mock-sellers'
+import { mockSellers, mockNotes, mockFiles, acquisitionManagers, onboardingManagers, accountManagers } from '@/lib/data/mock-sellers'
 import { getStageDefinition, acquisitionStages } from '@/lib/data/pipeline-stages'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
 import { getChecklistForStage } from '@/lib/data/stage-checklists'
@@ -252,9 +252,52 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Assignment</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-xs text-muted-foreground mb-1">SAM Manager</p>
-                  <p className="text-sm font-medium">{seller.samManager}</p>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
+                    <Select defaultValue={seller.acquisitionManager || undefined}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Not assigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {acquisitionManagers.map((manager) => (
+                          <SelectItem key={manager} value={manager}>
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
+                    <Select defaultValue={seller.onboardingManager || undefined}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Not assigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {onboardingManagers.map((manager) => (
+                          <SelectItem key={manager} value={manager}>
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
+                    <Select defaultValue={seller.accountManager || undefined}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Not assigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accountManagers.map((manager) => (
+                          <SelectItem key={manager} value={manager}>
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardContent>
               </Card>
 

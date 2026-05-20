@@ -50,7 +50,9 @@ export interface Seller {
   priorityScore: number | null // 1.0 - 5.0 scale, null for no score
   pipeline: PipelineType
   stage: PipelineStage
-  samManager: string
+  acquisitionManager: string | null
+  onboardingManager: string | null
+  accountManager: string | null
   daysIdle: number
   gmvPotential: 'low' | 'medium' | 'high' | 'very-high' | null
   companiesHousePass: boolean
