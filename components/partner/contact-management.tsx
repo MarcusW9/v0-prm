@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Phone, Plus, Pencil, Trash2, X, Check } from 'lucide-react'
+import { User, Mail, Phone, Plus, Pencil, Trash2, Building2, Calendar, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -33,6 +33,9 @@ import type { Contact, ContactRole } from '@/lib/types/seller'
 import { contactRoleOptions } from '@/lib/data/mock-sellers'
 
 interface ContactManagementProps {
+  companyName: string
+  crn: string
+  createdAt: Date
   primaryContact: Contact
   additionalContacts: Contact[]
   onPrimaryContactChange?: (contact: Contact) => void
@@ -58,55 +61,59 @@ const getRoleLabel = (role: ContactRole) => {
   return option?.label || role
 }
 
-interface ContactCardProps {
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date)
+}
+
+interface ContactRowProps {
   contact: Contact
   isPrimary?: boolean
   onEdit: () => void
   onDelete?: () => void
 }
 
-function ContactCard({ contact, isPrimary, onEdit, onDelete }: ContactCardProps) {
+function ContactRow({ contact, isPrimary, onEdit, onDelete }: ContactRowProps) {
   return (
     <div className={cn(
-      "rounded-lg border p-4",
-      isPrimary ? "border-blue-200 bg-blue-50/50" : "bg-white"
+      "flex items-center justify-between py-3 px-4 rounded-lg",
+      isPrimary ? "bg-slate-50" : "bg-white border"
     )}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-sm">{contact.name}</span>
-          <Badge variant="secondary" className={cn("text-xs", getRoleBadgeColor(contact.role))}>
-            {getRoleLabel(contact.role)}
-          </Badge>
-          {isPrimary && (
-            <Badge variant="outline" className="text-xs border-blue-300 text-blue-600">
-              Primary
-            </Badge>
-          )}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center h-9 w-9 rounded-full bg-slate-200 text-slate-600 text-sm font-medium">
+          {contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
         </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit}>
-            <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-          </Button>
-          {onDelete && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete}>
-              <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-            </Button>
-          )}
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm">{contact.name}</span>
+            <Badge variant="secondary" className={cn("text-xs", getRoleBadgeColor(contact.role))}>
+              {getRoleLabel(contact.role)}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground mt-0.5">
+            <span className="flex items-center gap-1">
+              <Mail className="h-3 w-3" />
+              {contact.email}
+            </span>
+            <span className="flex items-center gap-1">
+              <Phone className="h-3 w-3" />
+              {contact.phone}
+            </span>
+          </div>
         </div>
       </div>
-      <div className="space-y-1.5 text-sm">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Mail className="h-3.5 w-3.5" />
-          <a href={`mailto:${contact.email}`} className="hover:text-foreground hover:underline">
-            {contact.email}
-          </a>
-        </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Phone className="h-3.5 w-3.5" />
-          <a href={`tel:${contact.phone}`} className="hover:text-foreground hover:underline">
-            {contact.phone}
-          </a>
-        </div>
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+          <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+        </Button>
+        {onDelete && (
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onDelete}>
+            <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+          </Button>
+        )}
       </div>
     </div>
   )
@@ -138,6 +145,16 @@ function ContactDialog({ open, onOpenChange, contact, onSave, title }: ContactDi
     setPhone('')
     setRole('account')
   }
+
+  // Reset form when contact changes
+  useState(() => {
+    if (contact) {
+      setName(contact.name)
+      setEmail(contact.email)
+      setPhone(contact.phone)
+      setRole(contact.role)
+    }
+  })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -206,12 +223,15 @@ function ContactDialog({ open, onOpenChange, contact, onSave, title }: ContactDi
 }
 
 export function ContactManagement({
+  companyName,
+  crn,
+  createdAt,
   primaryContact,
   additionalContacts,
   onPrimaryContactChange,
   onAdditionalContactsChange,
 }: ContactManagementProps) {
-  const [isAdditionalOpen, setIsAdditionalOpen] = useState(additionalContacts.length > 0)
+  const [isAdditionalOpen, setIsAdditionalOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -261,96 +281,84 @@ export function ContactManagement({
     setIsAdditionalOpen(true)
   }
 
-  const technicalContact = additionalContacts.find(c => c.role === 'technical')
-
   return (
-    <div className="space-y-4">
-      {/* Primary Contact - Always visible */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Primary Contact
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ContactCard
+    <Card>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Building2 className="h-4 w-4" />
+          Company Information
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Company Details */}
+        <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Building2 className="h-4 w-4" />
+            <span>CRN: {crn}</span>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            <span>Added {formatDate(createdAt)}</span>
+          </div>
+        </div>
+
+        {/* Primary Contact - Always visible */}
+        <div>
+          <h4 className="text-sm font-medium text-muted-foreground mb-2">Primary Contact</h4>
+          <ContactRow
             contact={primaryContact}
             isPrimary
             onEdit={handleEditPrimary}
           />
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Additional Contacts - Collapsible */}
-      <Collapsible open={isAdditionalOpen} onOpenChange={setIsAdditionalOpen}>
-        <Card>
+        {/* Additional Contacts - Collapsible */}
+        <Collapsible open={isAdditionalOpen} onOpenChange={setIsAdditionalOpen}>
           <CollapsibleTrigger asChild>
-            <CardHeader className="pb-3 cursor-pointer hover:bg-muted/50 transition-colors">
-              <CardTitle className="text-base flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  Additional Contacts
-                  {additionalContacts.length > 0 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {additionalContacts.length}
-                    </Badge>
-                  )}
-                </span>
-                <span className="text-xs font-normal text-muted-foreground">
-                  {isAdditionalOpen ? 'Click to collapse' : 'Click to expand'}
-                </span>
-              </CardTitle>
-            </CardHeader>
+            <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <span className="flex items-center gap-2">
+                Additional Contacts
+                {additionalContacts.length > 0 && (
+                  <Badge variant="secondary" className="text-xs bg-slate-100">
+                    {additionalContacts.length}
+                  </Badge>
+                )}
+              </span>
+              <ChevronDown className={cn(
+                "h-4 w-4 transition-transform",
+                isAdditionalOpen && "rotate-180"
+              )} />
+            </button>
           </CollapsibleTrigger>
-          <CollapsibleContent>
-            <CardContent className="pt-0">
-              {additionalContacts.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No additional contacts yet.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {additionalContacts.map((contact) => (
-                    <ContactCard
-                      key={contact.id}
-                      contact={contact}
-                      onEdit={() => handleEditAdditional(contact)}
-                      onDelete={() => handleDeleteAdditional(contact.id)}
-                    />
-                  ))}
-                </div>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-4"
-                onClick={() => setIsAddDialogOpen(true)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Contact
-              </Button>
-            </CardContent>
+          <CollapsibleContent className="pt-2">
+            {additionalContacts.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4 border rounded-lg bg-slate-50">
+                No additional contacts yet.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {additionalContacts.map((contact) => (
+                  <ContactRow
+                    key={contact.id}
+                    contact={contact}
+                    onEdit={() => handleEditAdditional(contact)}
+                    onDelete={() => handleDeleteAdditional(contact.id)}
+                  />
+                ))}
+              </div>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full mt-3"
+              onClick={() => setIsAddDialogOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Contact
+            </Button>
           </CollapsibleContent>
-        </Card>
-      </Collapsible>
-
-      {/* Technical Contact Highlight (if exists) */}
-      {technicalContact && (
-        <Card className="border-purple-200 bg-purple-50/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2 text-purple-700">
-              Technical Contact
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm space-y-1">
-              <p className="font-medium">{technicalContact.name}</p>
-              <p className="text-muted-foreground">{technicalContact.email}</p>
-              <p className="text-muted-foreground">{technicalContact.phone}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        </Collapsible>
+      </CardContent>
 
       {/* Edit Dialog */}
       <ContactDialog
@@ -368,6 +376,6 @@ export function ContactManagement({
         onSave={handleAddContact}
         title="Add New Contact"
       />
-    </div>
+    </Card>
   )
 }

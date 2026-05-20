@@ -6,7 +6,7 @@ import { mockSellers, mockNotes, mockFiles, acquisitionManagers, onboardingManag
 import { getStageDefinition, acquisitionStages } from '@/lib/data/pipeline-stages'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
 import { getChecklistForStage } from '@/lib/data/stage-checklists'
-import { ArrowLeft, Building2, Calendar, CheckCircle2, XCircle, Upload, FileText, FileSpreadsheet } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, XCircle, Upload, FileText, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -231,34 +231,18 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
           <TabsContent value="overview" className="mt-0">
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Contact Management - Full width on first row */}
+              {/* Company Information with Contacts - Full width */}
               <div className="lg:col-span-2">
                 <ContactManagement
+                  companyName={seller.companyName}
+                  crn={seller.crn}
+                  createdAt={seller.createdAt}
                   primaryContact={primaryContact}
                   additionalContacts={additionalContacts}
                   onPrimaryContactChange={setPrimaryContact}
                   onAdditionalContactsChange={setAdditionalContacts}
                 />
               </div>
-
-              {/* Company Info */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Company Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">CRN: {seller.crn}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      Added {formatDate(seller.createdAt)}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Assignment */}
               <Card>
