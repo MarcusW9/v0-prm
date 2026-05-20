@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Search, Plus, ExternalLink, Download, X } from 'lucide-react'
+import { Search, Plus, ExternalLink, Download, X, ChevronDown, Check, Filter } from 'lucide-react'
 import type { Seller, PipelineStage, PriorityLevel, SellerCategory, IntegrationMethod, Agency } from '@/lib/types/seller'
 import { getStageDefinition, getPriorityColor, acquisitionStages, onboardingStages, accountManagementStages } from '@/lib/data/pipeline-stages'
 import { 
@@ -16,6 +16,16 @@ import {
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -33,6 +43,7 @@ import {
 } from '@/components/ui/table'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface PartnersTableProps {
   sellers: Seller[]
@@ -49,10 +60,94 @@ const priorityOptions: { value: PriorityLevel; label: string }[] = [
 const allStages = [...acquisitionStages, ...onboardingStages, ...accountManagementStages]
 const allManagers = [...new Set([...acquisitionManagers, ...onboardingManagers, ...accountManagers])]
 
+// Filter chip colors for visual distinction
+const filterColors: Record<string, { bg: string; text: string; border: string }> = {
+  category: { bg: 'bg-blue-100', text: 'text-blue-700', border: 'border-blue-200' },
+  integration: { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
+  agency: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200' },
+  manager: { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200' },
+  stage: { bg: 'bg-rose-100', text: 'text-rose-700', border: 'border-rose-200' },
+  priority: { bg: 'bg-cyan-100', text: 'text-cyan-700', border: 'border-cyan-200' },
+}
+
+interface FilterDropdownProps<T extends string> {
+  label: string
+  options: { value: T; label: string }[]
+  selected: T[]
+  onToggle: (value: T) => void
+  colorKey: keyof typeof filterColors
+}
+
+function FilterDropdown<T extends string>({ 
+  label, 
+  options, 
+  selected, 
+  onToggle,
+  colorKey 
+}: FilterDropdownProps<T>) {
+  const hasSelection = selected.length > 0
+  const colors = filterColors[colorKey]
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn(
+            'h-9 justify-between gap-2 font-normal',
+            hasSelection && `${colors.bg} ${colors.text} ${colors.border} border`
+          )}
+        >
+          {label}
+          {hasSelection && (
+            <span className={cn(
+              'flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium',
+              colors.bg, colors.text
+            )}>
+              {selected.length}
+            </span>
+          )}
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-2" align="start">
+        <div className="space-y-1">
+          {options.map((option) => {
+            const isSelected = selected.includes(option.value)
+            return (
+              <button
+                key={option.value}
+                onClick={() => onToggle(option.value)}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+                  isSelected 
+                    ? `${colors.bg} ${colors.text}` 
+                    : 'hover:bg-slate-100'
+                )}
+              >
+                <Checkbox 
+                  checked={isSelected} 
+                  className={cn(
+                    'pointer-events-none',
+                    isSelected && colors.border
+                  )}
+                />
+                <span>{option.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 export function PartnersTable({ sellers }: PartnersTableProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'stage'>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [isFilterOpen, setIsFilterOpen] = useState(true)
   
   // Multi-select filter states
   const [selectedCategories, setSelectedCategories] = useState<SellerCategory[]>([])
@@ -234,29 +329,43 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedPriorities.length > 0 ||
     searchQuery.length > 0
 
-  const activeFilterChips: { label: string; onRemove: () => void }[] = [
+  const totalActiveFilters = 
+    selectedCategories.length +
+    selectedIntegrations.length +
+    selectedAgencies.length +
+    selectedManagers.length +
+    selectedStages.length +
+    selectedPriorities.length
+
+  const activeFilterChips: { label: string; type: keyof typeof filterColors; onRemove: () => void }[] = [
     ...selectedCategories.map((c) => ({
-      label: `Category: ${categoryOptions.find((o) => o.value === c)?.label}`,
+      label: categoryOptions.find((o) => o.value === c)?.label || c,
+      type: 'category' as const,
       onRemove: () => toggleFilter(c, selectedCategories, setSelectedCategories),
     })),
     ...selectedIntegrations.map((i) => ({
-      label: `Integration: ${integrationOptions.find((o) => o.value === i)?.label}`,
+      label: integrationOptions.find((o) => o.value === i)?.label || i,
+      type: 'integration' as const,
       onRemove: () => toggleFilter(i, selectedIntegrations, setSelectedIntegrations),
     })),
     ...selectedAgencies.map((a) => ({
-      label: `Agency: ${agencyOptions.find((o) => o.value === a)?.label}`,
+      label: agencyOptions.find((o) => o.value === a)?.label || a,
+      type: 'agency' as const,
       onRemove: () => toggleFilter(a, selectedAgencies, setSelectedAgencies),
     })),
     ...selectedManagers.map((m) => ({
-      label: `Manager: ${m}`,
+      label: m,
+      type: 'manager' as const,
       onRemove: () => toggleFilter(m, selectedManagers, setSelectedManagers),
     })),
     ...selectedStages.map((s) => ({
-      label: `Stage: ${allStages.find((st) => st.id === s)?.label}`,
+      label: allStages.find((st) => st.id === s)?.label || s,
+      type: 'stage' as const,
       onRemove: () => toggleFilter(s, selectedStages, setSelectedStages),
     })),
     ...selectedPriorities.map((p) => ({
-      label: `Priority: ${priorityOptions.find((o) => o.value === p)?.label}`,
+      label: priorityOptions.find((o) => o.value === p)?.label || p,
+      type: 'priority' as const,
       onRemove: () => toggleFilter(p, selectedPriorities, setSelectedPriorities),
     })),
   ]
@@ -316,165 +425,113 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
         </Select>
       </div>
 
-      {/* Filter Dropdowns Row */}
-      <div className="flex flex-wrap items-center gap-3">
-        {/* Category Filter */}
-        <Select
-          value={selectedCategories.length === 1 ? selectedCategories[0] : ''}
-          onValueChange={(v) => toggleFilter(v as SellerCategory, selectedCategories, setSelectedCategories)}
-        >
-          <SelectTrigger className="w-36">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categoryOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                <span className="flex items-center gap-2">
-                  {selectedCategories.includes(opt.value as SellerCategory) && (
-                    <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  )}
-                  {opt.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Integration Filter */}
-        <Select
-          value={selectedIntegrations.length === 1 ? selectedIntegrations[0] : ''}
-          onValueChange={(v) => toggleFilter(v as IntegrationMethod, selectedIntegrations, setSelectedIntegrations)}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Integration" />
-          </SelectTrigger>
-          <SelectContent>
-            {integrationOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                <span className="flex items-center gap-2">
-                  {selectedIntegrations.includes(opt.value as IntegrationMethod) && (
-                    <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  )}
-                  {opt.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Agency Filter */}
-        <Select
-          value={selectedAgencies.length === 1 ? selectedAgencies[0] : ''}
-          onValueChange={(v) => toggleFilter(v as Agency, selectedAgencies, setSelectedAgencies)}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Agency" />
-          </SelectTrigger>
-          <SelectContent>
-            {agencyOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                <span className="flex items-center gap-2">
-                  {selectedAgencies.includes(opt.value as Agency) && (
-                    <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  )}
-                  {opt.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Manager Filter */}
-        <Select
-          value={selectedManagers.length === 1 ? selectedManagers[0] : ''}
-          onValueChange={(v) => toggleFilter(v, selectedManagers, setSelectedManagers)}
-        >
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Manager" />
-          </SelectTrigger>
-          <SelectContent>
-            {allManagers.map((manager) => (
-              <SelectItem key={manager} value={manager}>
-                <span className="flex items-center gap-2">
-                  {selectedManagers.includes(manager) && (
-                    <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  )}
-                  {manager}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Stage Filter */}
-        <Select
-          value={selectedStages.length === 1 ? selectedStages[0] : ''}
-          onValueChange={(v) => toggleFilter(v as PipelineStage, selectedStages, setSelectedStages)}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Stage" />
-          </SelectTrigger>
-          <SelectContent>
-            {allStages.map((stage) => (
-              <SelectItem key={stage.id} value={stage.id}>
-                <span className="flex items-center gap-2">
-                  {selectedStages.includes(stage.id as PipelineStage) && (
-                    <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  )}
-                  {stage.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Priority Filter */}
-        <Select
-          value={selectedPriorities.length === 1 ? selectedPriorities[0] : ''}
-          onValueChange={(v) => toggleFilter(v as PriorityLevel, selectedPriorities, setSelectedPriorities)}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Priority" />
-          </SelectTrigger>
-          <SelectContent>
-            {priorityOptions.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
-                <span className="flex items-center gap-2">
-                  {selectedPriorities.includes(opt.value) && (
-                    <span className="h-2 w-2 rounded-full bg-orange-500" />
-                  )}
-                  {opt.label}
-                </span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-slate-500">
-            Clear all
+      {/* Collapsible Filter Section */}
+      <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="w-full justify-between">
+            <span className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              Filter by...
+              {totalActiveFilters > 0 && (
+                <Badge className="bg-orange-500 text-white hover:bg-orange-600">
+                  {totalActiveFilters} active
+                </Badge>
+              )}
+            </span>
+            <ChevronDown className={cn(
+              'h-4 w-4 transition-transform',
+              isFilterOpen && 'rotate-180'
+            )} />
           </Button>
-        )}
-      </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3">
+          <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-slate-50 p-4">
+            <FilterDropdown
+              label="Category"
+              options={categoryOptions as { value: SellerCategory; label: string }[]}
+              selected={selectedCategories}
+              onToggle={(v) => toggleFilter(v, selectedCategories, setSelectedCategories)}
+              colorKey="category"
+            />
+
+            <FilterDropdown
+              label="Integration"
+              options={integrationOptions as { value: IntegrationMethod; label: string }[]}
+              selected={selectedIntegrations}
+              onToggle={(v) => toggleFilter(v, selectedIntegrations, setSelectedIntegrations)}
+              colorKey="integration"
+            />
+
+            <FilterDropdown
+              label="Agency"
+              options={agencyOptions as { value: Agency; label: string }[]}
+              selected={selectedAgencies}
+              onToggle={(v) => toggleFilter(v, selectedAgencies, setSelectedAgencies)}
+              colorKey="agency"
+            />
+
+            <FilterDropdown
+              label="Manager"
+              options={allManagers.map((m) => ({ value: m, label: m }))}
+              selected={selectedManagers}
+              onToggle={(v) => toggleFilter(v, selectedManagers, setSelectedManagers)}
+              colorKey="manager"
+            />
+
+            <FilterDropdown
+              label="Stage"
+              options={allStages.map((s) => ({ value: s.id, label: s.label })) as { value: PipelineStage; label: string }[]}
+              selected={selectedStages}
+              onToggle={(v) => toggleFilter(v, selectedStages, setSelectedStages)}
+              colorKey="stage"
+            />
+
+            <FilterDropdown
+              label="Priority"
+              options={priorityOptions}
+              selected={selectedPriorities}
+              onToggle={(v) => toggleFilter(v, selectedPriorities, setSelectedPriorities)}
+              colorKey="priority"
+            />
+
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-slate-500 ml-auto">
+                Clear all
+              </Button>
+            )}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Active Filter Chips */}
       {activeFilterChips.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          {activeFilterChips.map((chip, idx) => (
-            <Badge
-              key={idx}
-              variant="secondary"
-              className="flex items-center gap-1 bg-slate-100 text-slate-700 hover:bg-slate-200"
-            >
-              {chip.label}
-              <button
-                onClick={chip.onRemove}
-                className="ml-1 rounded-full p-0.5 hover:bg-slate-300"
+          {activeFilterChips.map((chip, idx) => {
+            const colors = filterColors[chip.type]
+            return (
+              <Badge
+                key={idx}
+                variant="secondary"
+                className={cn(
+                  'flex items-center gap-1.5 border px-3 py-1',
+                  colors.bg,
+                  colors.text,
+                  colors.border
+                )}
               >
-                <X className="h-3 w-3" />
-              </button>
-            </Badge>
-          ))}
+                {chip.label}
+                <button
+                  onClick={chip.onRemove}
+                  className={cn(
+                    'ml-1 rounded-full p-0.5 transition-colors',
+                    'hover:bg-white/50'
+                  )}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )
+          })}
         </div>
       )}
 
@@ -552,14 +609,21 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                           {seller.priorityScore.toFixed(1)}
                         </span>
                       ) : (
-                        <span className="text-sm text-slate-400">—</span>
+                        <span className="text-sm text-slate-400">-</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-slate-600">{integrationLabel ?? '—'}</span>
+                      <span className="text-sm text-slate-600">
+                        {integrationLabel || '-'}
+                      </span>
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="h-8 w-8 p-0"
+                      >
                         <Link href={`/dashboard/partners/${seller.id}`}>
                           <ExternalLink className="h-4 w-4" />
                         </Link>
