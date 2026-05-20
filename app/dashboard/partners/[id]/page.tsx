@@ -231,20 +231,18 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
           <TabsContent value="overview" className="mt-0">
             <div className="grid gap-6 lg:grid-cols-2">
-              {/* Company Information with Contacts - Full width */}
-              <div className="lg:col-span-2">
-                <ContactManagement
-                  companyName={seller.companyName}
-                  crn={seller.crn}
-                  createdAt={seller.createdAt}
-                  primaryContact={primaryContact}
-                  additionalContacts={additionalContacts}
-                  onPrimaryContactChange={setPrimaryContact}
-                  onAdditionalContactsChange={setAdditionalContacts}
-                />
-              </div>
+              {/* Company Information with Contacts - Left column */}
+              <ContactManagement
+                companyName={seller.companyName}
+                crn={seller.crn}
+                createdAt={seller.createdAt}
+                primaryContact={primaryContact}
+                additionalContacts={additionalContacts}
+                onPrimaryContactChange={setPrimaryContact}
+                onAdditionalContactsChange={setAdditionalContacts}
+              />
 
-              {/* Assignment */}
+              {/* Assignment - Right column */}
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base">Assignment</CardTitle>
