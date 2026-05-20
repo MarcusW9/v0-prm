@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { KanbanBoard } from '@/components/pipeline/kanban-board'
 import { PipelineToggle } from '@/components/pipeline/pipeline-toggle'
 import { mockSellers } from '@/lib/data/mock-sellers'
@@ -12,8 +13,24 @@ const pipelineDescriptions: Record<PipelineType, string> = {
   'account-management': 'Monitor ongoing partner account health',
 }
 
+const validPipelineTypes: PipelineType[] = ['acquisition', 'onboarding', 'account-management']
+
 export default function PipelinePage() {
-  const [activeView, setActiveView] = useState<PipelineType>('acquisition')
+  const searchParams = useSearchParams()
+  const viewParam = searchParams.get('view')
+  
+  const initialView: PipelineType = validPipelineTypes.includes(viewParam as PipelineType) 
+    ? (viewParam as PipelineType) 
+    : 'acquisition'
+  
+  const [activeView, setActiveView] = useState<PipelineType>(initialView)
+
+  // Update view when URL param changes
+  useEffect(() => {
+    if (viewParam && validPipelineTypes.includes(viewParam as PipelineType)) {
+      setActiveView(viewParam as PipelineType)
+    }
+  }, [viewParam])
 
   return (
     <div className="flex h-full flex-col">

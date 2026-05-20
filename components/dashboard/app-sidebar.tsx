@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import {
   LayoutDashboard,
   Users,
@@ -9,6 +10,7 @@ import {
   UsersRound,
   Settings,
   ChevronUp,
+  ChevronDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -21,6 +23,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarFooter,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -30,6 +35,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 
 const navigation = {
   overview: [
@@ -37,7 +47,6 @@ const navigation = {
   ],
   partnerManagement: [
     { name: 'All Partners', href: '/dashboard/partners', icon: Users },
-    { name: 'Pipeline', href: '/dashboard/pipeline', icon: Columns3 },
   ],
   admin: [
     { name: 'Team', href: '/dashboard/team', icon: UsersRound },
@@ -45,14 +54,28 @@ const navigation = {
   ],
 }
 
+const pipelineViews = [
+  { name: 'Acquisition', value: 'acquisition' },
+  { name: 'Onboarding', value: 'onboarding' },
+  { name: 'Account Management', value: 'account-management' },
+]
+
 export function AppSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [pipelineOpen, setPipelineOpen] = useState(pathname.startsWith('/dashboard/pipeline'))
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
       return pathname === '/dashboard'
     }
     return pathname.startsWith(href)
+  }
+
+  const isPipelineActive = pathname.startsWith('/dashboard/pipeline')
+
+  const handlePipelineNavigation = (view: string) => {
+    router.push(`/dashboard/pipeline?view=${view}`)
   }
 
   return (
@@ -119,6 +142,41 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              
+              {/* Pipeline with expandable sub-menu */}
+              <Collapsible open={pipelineOpen} onOpenChange={setPipelineOpen}>
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      className={cn(
+                        'text-slate-300 hover:bg-slate-700 hover:text-white w-full',
+                        isPipelineActive && 'bg-slate-700 text-white'
+                      )}
+                    >
+                      <Columns3 className="h-4 w-4" />
+                      <span className="flex-1">Pipeline</span>
+                      <ChevronDown className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        pipelineOpen && "rotate-180"
+                      )} />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {pipelineViews.map((view) => (
+                        <SidebarMenuSubItem key={view.value}>
+                          <SidebarMenuSubButton
+                            onClick={() => handlePipelineNavigation(view.value)}
+                            className="text-slate-400 hover:bg-slate-700 hover:text-white cursor-pointer"
+                          >
+                            <span>{view.name}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
