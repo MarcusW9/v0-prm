@@ -41,6 +41,12 @@ export interface StageChecklistCompletion {
   items: ChecklistItemCompletion[]
 }
 
+export type SellerCategory = 'electronics' | 'home' | 'toys' | 'garden' | 'kitchen' | 'furniture' | 'lighting' | 'other'
+
+export type IntegrationMethod = 'linnworks' | 'channelAdvisor' | 'brightpearl' | 'tradegecko' | 'manual' | 'other'
+
+export type Agency = 'time-online' | 'ecommerce-agency' | 'retail-solutions' | 'direct' | 'other'
+
 export interface Seller {
   id: string
   companyName: string
@@ -53,6 +59,10 @@ export interface Seller {
   acquisitionManager: string | null
   onboardingManager: string | null
   accountManager: string | null
+  // Filter dimensions
+  category: SellerCategory
+  integrationMethod: IntegrationMethod | null
+  agency: Agency
   daysIdle: number
   gmvPotential: 'low' | 'medium' | 'high' | 'very-high' | null
   companiesHousePass: boolean
