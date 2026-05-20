@@ -139,8 +139,14 @@ export function KanbanBoard({ sellers: initialSellers, pipelineType }: KanbanBoa
       <div className="mb-4 flex items-center gap-2 text-sm">
         {stages.map((stage, index) => (
           <div key={stage.id} className="flex items-center gap-2">
-            <span className={stage.color}>{stage.label}</span>
-            <span className="text-slate-400">{sellersByStage[stage.id]?.length || 0}</span>
+            <span className={cn(
+              'px-2.5 py-1 rounded-md font-medium',
+              stage.bgColor,
+              stage.color
+            )}>
+              {stage.label}
+              <span className="ml-1.5 opacity-70">{sellersByStage[stage.id]?.length || 0}</span>
+            </span>
             {index < stages.length - 1 && (
               <span className="text-slate-300">→</span>
             )}
