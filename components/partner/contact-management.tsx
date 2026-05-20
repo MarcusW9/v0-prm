@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Phone, Plus, Pencil, Trash2, Building2, Calendar, ChevronDown } from 'lucide-react'
+import { User, Mail, Phone, Plus, Pencil, Trash2, Building2, Calendar, ChevronDown, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -77,6 +77,11 @@ interface ContactRowProps {
 }
 
 function ContactRow({ contact, isPrimary, onEdit, onDelete }: ContactRowProps) {
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    toast.success(`${label} copied to clipboard`)
+  }
+
   return (
     <div className={cn(
       "flex items-center justify-between py-3 px-4 rounded-lg",
@@ -97,10 +102,24 @@ function ContactRow({ contact, isPrimary, onEdit, onDelete }: ContactRowProps) {
             <span className="flex items-center gap-1">
               <Mail className="h-3 w-3" />
               {contact.email}
+              <button
+                onClick={() => copyToClipboard(contact.email, 'Email')}
+                className="ml-1 hover:text-foreground transition-colors"
+                title="Copy email"
+              >
+                <Copy className="h-3 w-3" />
+              </button>
             </span>
             <span className="flex items-center gap-1">
               <Phone className="h-3 w-3" />
               {contact.phone}
+              <button
+                onClick={() => copyToClipboard(contact.phone, 'Phone')}
+                className="ml-1 hover:text-foreground transition-colors"
+                title="Copy phone"
+              >
+                <Copy className="h-3 w-3" />
+              </button>
             </span>
           </div>
         </div>
