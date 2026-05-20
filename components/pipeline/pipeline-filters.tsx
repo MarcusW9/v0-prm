@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import type { PriorityLevel } from '@/lib/types/seller'
-import { samManagers } from '@/lib/data/mock-sellers'
+import { acquisitionManagers } from '@/lib/data/mock-sellers'
 import {
   Select,
   SelectContent,
@@ -45,7 +45,7 @@ export function PipelineFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All managers</SelectItem>
-            {samManagers.map((manager) => (
+            {acquisitionManagers.map((manager) => (
               <SelectItem key={manager} value={manager}>
                 {manager}
               </SelectItem>
