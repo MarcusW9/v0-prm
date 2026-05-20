@@ -6,7 +6,7 @@ import { mockSellers, mockNotes, mockFiles, acquisitionManagers, onboardingManag
 import { getStageDefinition, acquisitionStages } from '@/lib/data/pipeline-stages'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
 import { getChecklistForStage } from '@/lib/data/stage-checklists'
-import { ArrowLeft, User, Mail, Building2, Calendar, CheckCircle2, XCircle, Upload, FileText, FileSpreadsheet } from 'lucide-react'
+import { ArrowLeft, Building2, Calendar, CheckCircle2, XCircle, Upload, FileText, FileSpreadsheet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -25,7 +25,8 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { StageChecklists, hasIncompleteItems } from '@/components/partner/stage-checklists'
 import { IncompleteChecklistDialog } from '@/components/partner/incomplete-checklist-dialog'
-import type { AcquisitionStage, ChecklistItemCompletion } from '@/lib/types/seller'
+import { ContactManagement } from '@/components/partner/contact-management'
+import type { AcquisitionStage, ChecklistItemCompletion, Contact } from '@/lib/types/seller'
 
 interface PartnerDetailPageProps {
   params: Promise<{ id: string }>
@@ -50,6 +51,16 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const [showIncompleteDialog, setShowIncompleteDialog] = useState(false)
   const [pendingStageChange, setPendingStageChange] = useState<AcquisitionStage | null>(null)
   const [incompleteItems, setIncompleteItems] = useState<string[]>([])
+  
+  // Contact state
+  const [primaryContact, setPrimaryContact] = useState<Contact>(seller?.primaryContact || {
+    id: 'new',
+    name: '',
+    email: '',
+    phone: '',
+    role: 'account',
+  })
+  const [additionalContacts, setAdditionalContacts] = useState<Contact[]>(seller?.additionalContacts || [])
   
   if (!seller) {
     return (
@@ -219,21 +230,23 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           </TabsList>
 
           <TabsContent value="overview" className="mt-0">
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Contact Information */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Contact Management - Full width on first row */}
+              <div className="lg:col-span-2">
+                <ContactManagement
+                  primaryContact={primaryContact}
+                  additionalContacts={additionalContacts}
+                  onPrimaryContactChange={setPrimaryContact}
+                  onAdditionalContactsChange={setAdditionalContacts}
+                />
+              </div>
+
+              {/* Company Info */}
               <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Contact Information</CardTitle>
+                  <CardTitle className="text-base">Company Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span>{seller.contactName}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">{seller.contactEmail}</span>
-                  </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">CRN: {seller.crn}</span>

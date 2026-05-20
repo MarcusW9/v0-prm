@@ -47,12 +47,25 @@ export type IntegrationMethod = 'linnworks' | 'channelAdvisor' | 'brightpearl' |
 
 export type Agency = 'time-online' | 'ecommerce-agency' | 'retail-solutions' | 'direct' | 'other'
 
+export type ContactRole = 'account' | 'technical' | 'operations' | 'commercial' | 'other'
+
+export interface Contact {
+  id: string
+  name: string
+  email: string
+  phone: string
+  role: ContactRole
+  roleDescription?: string // Free text for 'other' role
+}
+
 export interface Seller {
   id: string
   companyName: string
   crn: string // Company Registration Number
-  contactName: string
-  contactEmail: string
+  // Primary contact (mandatory)
+  primaryContact: Contact
+  // Additional contacts (optional array)
+  additionalContacts: Contact[]
   priorityScore: number | null // 1.0 - 5.0 scale, null for no score
   pipeline: PipelineType
   stage: PipelineStage

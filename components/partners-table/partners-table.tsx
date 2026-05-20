@@ -185,8 +185,8 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
           const query = searchQuery.toLowerCase()
           if (
             !seller.companyName.toLowerCase().includes(query) &&
-            !seller.contactName.toLowerCase().includes(query) &&
-            !seller.contactEmail.toLowerCase().includes(query)
+        !seller.primaryContact.name.toLowerCase().includes(query) &&
+        !seller.primaryContact.email.toLowerCase().includes(query)
           ) {
             return false
           }
@@ -277,6 +277,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
       'CRN',
       'Contact Name',
       'Contact Email',
+      'Contact Phone',
       'Pipeline',
       'Stage',
       'Priority Score',
@@ -293,8 +294,9 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     const rows = filteredSellers.map((seller) => [
       seller.companyName,
       seller.crn,
-      seller.contactName,
-      seller.contactEmail,
+      seller.primaryContact.name,
+      seller.primaryContact.email,
+      seller.primaryContact.phone,
       seller.pipeline,
       seller.stage,
       seller.priorityScore?.toString() ?? '',
@@ -575,7 +577,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
                         </Avatar>
                         <div>
                           <div className="font-medium text-slate-900">{seller.companyName}</div>
-                          <div className="text-sm text-slate-500">{seller.contactName}</div>
+                          <div className="text-sm text-slate-500">{seller.primaryContact.name}</div>
                         </div>
                       </Link>
                     </TableCell>
