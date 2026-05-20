@@ -29,10 +29,10 @@ export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
       stage.bgColor
     )}>
       {/* Column Header */}
-      <div className="flex items-center justify-between px-3 pt-3 pb-2">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <h3 className={cn("text-sm font-medium", stage.color)}>{stage.label}</h3>
         <span className={cn(
-          "flex h-5 min-w-5 items-center justify-center rounded px-1.5 text-xs font-medium",
+          "flex h-6 min-w-6 items-center justify-center rounded px-2 text-xs font-medium",
           "bg-white/60",
           stage.color
         )}>
