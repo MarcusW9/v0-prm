@@ -1,7 +1,7 @@
 import type { PipelineDefinition, StageDefinition, PipelineType, PipelineStage } from '@/lib/types/seller'
 
 export const acquisitionStages: StageDefinition[] = [
-  { id: 'identified', label: 'Identified', color: 'text-indigo-700', bgColor: 'bg-indigo-50' },
+  { id: 'identified', label: 'Identified', color: 'text-slate-700', bgColor: 'bg-slate-50' },
   { id: 'prospecting', label: 'Prospecting', color: 'text-amber-700', bgColor: 'bg-amber-50' },
   { id: 'pitched', label: 'Pitched', color: 'text-yellow-700', bgColor: 'bg-yellow-50' },
   { id: 'vetting', label: 'Vetting', color: 'text-orange-700', bgColor: 'bg-orange-50' },
