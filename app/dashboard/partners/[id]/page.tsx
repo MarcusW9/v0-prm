@@ -315,6 +315,22 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                         <p className="text-sm font-medium">{seller.primaryContact.phone}</p>
                       </div>
                     )}
+
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
+                      <p className="text-sm font-medium">{seller.crn}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Product Categories</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {seller.primaryProductCategories.map((cat) => (
+                          <span key={cat} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -381,10 +397,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
-                                <p className="text-sm font-medium">{seller.crn}</p>
-                              </div>
-                              <div>
                                 <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
                                 <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
                               </div>
@@ -405,16 +417,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
                           {/* Right Column - Business Details */}
                           <div className="space-y-4">
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Product Categories</p>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {seller.primaryProductCategories.map((cat) => (
-                                  <span key={cat} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                                    {cat}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <p className="text-xs text-muted-foreground mb-1">Expected Products</p>
