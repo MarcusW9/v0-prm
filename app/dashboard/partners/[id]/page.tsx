@@ -6,6 +6,23 @@ import { mockSellers, mockNotes, mockFiles, acquisitionManagers, onboardingManag
 import { getStageDefinition, acquisitionStages } from '@/lib/data/pipeline-stages'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
 import { getChecklistForStage } from '@/lib/data/stage-checklists'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -21,6 +38,7 @@ import {
   FileCheck,
   Calendar,
   Users,
+  GripVertical,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -52,12 +70,82 @@ interface PartnerDetailPageProps {
   params: Promise<{ id: string }>
 }
 
+// Sortable card wrapper component
+interface SortableCardProps {
+  id: string
+  children: React.ReactNode
+  isFullWidth?: boolean
+}
+
+function SortableCard({ id, children, isFullWidth = false }: SortableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(isFullWidth ? 'lg:col-span-2' : '')}
+    >
+      <div className="relative group">
+        <button
+          {...attributes}
+          {...listeners}
+          className="absolute left-2 top-3 z-10 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-slate-100 cursor-grab active:cursor-grabbing transition-opacity"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </button>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const { id } = use(params)
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true)
   const [newNote, setNewNote] = useState('')
+  
+  // Drag and drop for overview sections
+  const [sectionOrder, setSectionOrder] = useState([
+    'supplier-details',
+    'contact-details', 
+    'assignment',
+    'compliance-checks',
+  ])
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+  
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      setSectionOrder((items) => {
+        const oldIndex = items.indexOf(active.id as string)
+        const newIndex = items.indexOf(over.id as string)
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
   
   // Find seller
   const seller = mockSellers.find((s) => s.id === id)
@@ -382,187 +470,215 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           {/* Tab Content */}
           <div className="flex-1 overflow-y-auto p-6">
             <TabsContent value="overview" className="mt-0 h-full">
-                <div className="grid gap-6 lg:grid-cols-2">
-                  {/* Supplier Details - Full width */}
-                  <div className="lg:col-span-2">
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-muted-foreground" />
-                          <CardTitle className="text-base">Supplier Details</CardTitle>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
+                    <div className="grid gap-6 lg:grid-cols-2">
+                      {sectionOrder.map((sectionId) => {
+                        switch (sectionId) {
+                          case 'supplier-details':
+                            return (
+                              <SortableCard key={sectionId} id={sectionId} isFullWidth>
+                                <Card className="pl-8">
+                                  <CardHeader className="pb-3">
+                                    <div className="flex items-center gap-2">
+                                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                                      <CardTitle className="text-base">Supplier Details</CardTitle>
+                                    </div>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <div className="grid gap-6 lg:grid-cols-2">
+                                      {/* Left Column - Legal Identity */}
+                                      <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                          <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
+                                            <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
+                                          </div>
+                                          <div>
+                                            <p className="text-xs text-muted-foreground mb-1">VAT Number</p>
+                                            <p className="text-sm font-medium">{seller.vatNumber || '—'}</p>
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-muted-foreground mb-1">Registered Address</p>
+                                          <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
+                                        </div>
+                                      </div>
+
+                                      {/* Right Column - Business Details */}
+                                      <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                          <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Expected Products</p>
+                                            <p className="text-sm font-medium">
+                                              {seller.numberOfProductsExpected !== null 
+                                                ? seller.numberOfProductsExpected.toLocaleString()
+                                                : '—'}
+                                            </p>
+                                          </div>
+                                          <div>
+                                            <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
+                                            <p className="text-sm font-medium">
+                                              {seller.priorityScore !== null ? `${seller.priorityScore.toFixed(1)} / 5.0` : '—'}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
+                                          <Select defaultValue={seller.gmvPotential || undefined}>
+                                            <SelectTrigger className="w-full">
+                                              <SelectValue placeholder="Select GMV potential" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="low">Low</SelectItem>
+                                              <SelectItem value="medium">Medium</SelectItem>
+                                              <SelectItem value="high">High</SelectItem>
+                                              <SelectItem value="very-high">Very High</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </SortableCard>
+                            )
+                          case 'contact-details':
+                            return (
+                              <SortableCard key={sectionId} id={sectionId} isFullWidth>
+                                <div className="pl-8">
+                                  <ContactManagement
+                                    companyName={seller.companyName}
+                                    crn={seller.crn}
+                                    countryOfRegistration={seller.countryOfRegistration}
+                                    vatNumber={seller.vatNumber}
+                                    registeredAddress={seller.registeredAddress}
+                                    createdAt={seller.createdAt}
+                                    websiteUrl={seller.websiteUrl}
+                                    primaryContact={primaryContact}
+                                    additionalContacts={additionalContacts}
+                                    onPrimaryContactChange={setPrimaryContact}
+                                    onAdditionalContactsChange={setAdditionalContacts}
+                                    showLegalIdentity={false}
+                                  />
+                                </div>
+                              </SortableCard>
+                            )
+                          case 'assignment':
+                            return (
+                              <SortableCard key={sectionId} id={sectionId}>
+                                <Card className="pl-8">
+                                  <CardHeader className="pb-3">
+                                    <div className="flex items-center gap-2">
+                                      <Users className="h-4 w-4 text-muted-foreground" />
+                                      <CardTitle className="text-base">Assignment</CardTitle>
+                                    </div>
+                                  </CardHeader>
+                                  <CardContent className="space-y-4">
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
+                                      <Select defaultValue={seller.acquisitionManager || undefined}>
+                                        <SelectTrigger className="w-full">
+                                          <SelectValue placeholder="Not assigned" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {acquisitionManagers.map((manager) => (
+                                            <SelectItem key={manager} value={manager}>
+                                              {manager}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
+                                      <Select defaultValue={seller.onboardingManager || undefined}>
+                                        <SelectTrigger className="w-full">
+                                          <SelectValue placeholder="Not assigned" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {onboardingManagers.map((manager) => (
+                                            <SelectItem key={manager} value={manager}>
+                                              {manager}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
+                                      <Select defaultValue={seller.accountManager || undefined}>
+                                        <SelectTrigger className="w-full">
+                                          <SelectValue placeholder="Not assigned" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {accountManagers.map((manager) => (
+                                            <SelectItem key={manager} value={manager}>
+                                              {manager}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </SortableCard>
+                            )
+                          case 'compliance-checks':
+                            return (
+                              <SortableCard key={sectionId} id={sectionId}>
+                                <Card className="pl-8">
+                                  <CardHeader className="pb-3">
+                                    <CardTitle className="text-base">Compliance Checks</CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="space-y-3">
+                                    <div className="flex items-center gap-3">
+                                      {seller.companiesHousePass ? (
+                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                      ) : (
+                                        <XCircle className="h-4 w-4 text-muted-foreground" />
+                                      )}
+                                      <span className="text-sm">Companies House Pass</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      {seller.dnbPass ? (
+                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                      ) : (
+                                        <XCircle className="h-4 w-4 text-muted-foreground" />
+                                      )}
+                                      <span className="text-sm">D&B Pass</span>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </SortableCard>
+                            )
+                          default:
+                            return null
+                        }
+                      })}
+
+                      {/* Rejection Reason (if applicable) - not draggable */}
+                      {seller.rejectionReason && (
+                        <div className="lg:col-span-2">
+                          <Card>
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base text-red-600">Rejection Reason</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm text-red-600 bg-red-50 rounded-md p-3">
+                                {seller.rejectionReason}
+                              </p>
+                            </CardContent>
+                          </Card>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid gap-6 lg:grid-cols-2">
-                          {/* Left Column - Legal Identity */}
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
-                                <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">VAT Number</p>
-                                <p className="text-sm font-medium">{seller.vatNumber || '—'}</p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Registered Address</p>
-                              <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
-                            </div>
-                          </div>
-
-                          {/* Right Column - Business Details */}
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">Expected Products</p>
-                                <p className="text-sm font-medium">
-                                  {seller.numberOfProductsExpected !== null 
-                                    ? seller.numberOfProductsExpected.toLocaleString()
-                                    : '—'}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
-                                <p className="text-sm font-medium">
-                                  {seller.priorityScore !== null ? `${seller.priorityScore.toFixed(1)} / 5.0` : '—'}
-                                </p>
-                              </div>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
-                              <Select defaultValue={seller.gmvPotential || undefined}>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Select GMV potential" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="low">Low</SelectItem>
-                                  <SelectItem value="medium">Medium</SelectItem>
-                                  <SelectItem value="high">High</SelectItem>
-                                  <SelectItem value="very-high">Very High</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Contact Details - Full width */}
-                  <div className="lg:col-span-2">
-                    <ContactManagement
-                      companyName={seller.companyName}
-                      crn={seller.crn}
-                      countryOfRegistration={seller.countryOfRegistration}
-                      vatNumber={seller.vatNumber}
-                      registeredAddress={seller.registeredAddress}
-                      createdAt={seller.createdAt}
-                      websiteUrl={seller.websiteUrl}
-                      primaryContact={primaryContact}
-                      additionalContacts={additionalContacts}
-                      onPrimaryContactChange={setPrimaryContact}
-                      onAdditionalContactsChange={setAdditionalContacts}
-                      showLegalIdentity={false}
-                    />
-                  </div>
-
-                  {/* Assignment */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-base">Assignment</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
-                        <Select defaultValue={seller.acquisitionManager || undefined}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Not assigned" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {acquisitionManagers.map((manager) => (
-                              <SelectItem key={manager} value={manager}>
-                                {manager}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
-                        <Select defaultValue={seller.onboardingManager || undefined}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Not assigned" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {onboardingManagers.map((manager) => (
-                              <SelectItem key={manager} value={manager}>
-                                {manager}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
-                        <Select defaultValue={seller.accountManager || undefined}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Not assigned" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {accountManagers.map((manager) => (
-                              <SelectItem key={manager} value={manager}>
-                                {manager}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Compliance Checks */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Compliance Checks</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        {seller.companiesHousePass ? (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-muted-foreground" />
-                        )}
-                        <span className="text-sm">Companies House Pass</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {seller.dnbPass ? (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-muted-foreground" />
-                        )}
-                        <span className="text-sm">D&B Pass</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Rejection Reason (if applicable) */}
-                  {seller.rejectionReason && (
-                    <Card className="lg:col-span-2">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-base text-red-600">Rejection Reason</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-red-600 bg-red-50 rounded-md p-3">
-                          {seller.rejectionReason}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
+                      )}
+                    </div>
+                  </SortableContext>
+                </DndContext>}
                 </div>
               </TabsContent>
 
