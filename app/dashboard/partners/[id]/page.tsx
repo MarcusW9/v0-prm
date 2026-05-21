@@ -571,7 +571,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           )}
 
           {/* Collapse/Expand Toggle */}
-          <div className="border-t p-2 mt-auto">
+          <div className="sticky bottom-0 border-t p-2 bg-slate-100">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
