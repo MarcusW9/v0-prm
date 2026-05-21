@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Phone, Plus, Pencil, Trash2, Building2, Calendar, ChevronDown, Copy } from 'lucide-react'
+import { User, Mail, Phone, Plus, Pencil, Trash2, Building2, Calendar, ChevronDown, Copy, MapPin, FileText, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -29,13 +29,18 @@ import {
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import type { Contact, ContactRole } from '@/lib/types/seller'
+import type { Contact, ContactRole, RegisteredAddress } from '@/lib/types/seller'
 import { contactRoleOptions } from '@/lib/data/mock-sellers'
 
 interface ContactManagementProps {
+  // Legal Identity (read-only)
   companyName: string
   crn: string
+  countryOfRegistration: string
+  vatNumber: string | null
+  registeredAddress: RegisteredAddress
   createdAt: Date
+  // Operational (editable)
   primaryContact: Contact
   additionalContacts: Contact[]
   onPrimaryContactChange?: (contact: Contact) => void
@@ -67,6 +72,10 @@ const formatDate = (date: Date) => {
     month: '2-digit',
     year: 'numeric',
   }).format(date)
+}
+
+const formatAddress = (address: RegisteredAddress) => {
+  return `${address.city}, ${address.postcode}, ${address.country}`
 }
 
 interface ContactRowProps {
@@ -244,6 +253,9 @@ function ContactDialog({ open, onOpenChange, contact, onSave, title }: ContactDi
 export function ContactManagement({
   companyName,
   crn,
+  countryOfRegistration,
+  vatNumber,
+  registeredAddress,
   createdAt,
   primaryContact,
   additionalContacts,
@@ -305,78 +317,111 @@ export function ContactManagement({
       <CardHeader className="pb-4">
         <CardTitle className="text-base flex items-center gap-2">
           <Building2 className="h-4 w-4" />
-          Company Information
+          Supplier Details
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Company Details */}
-        <div className="flex items-center gap-6 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Building2 className="h-4 w-4" />
-            <span>CRN: {crn}</span>
+        {/* Legal Identity Section - Read Only */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Lock className="h-3 w-3" />
+            <span>Legal Identity (read-only)</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Calendar className="h-4 w-4" />
+          
+          <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-lg p-4">
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Company Name</p>
+              <p className="text-sm font-medium">{companyName}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Registration Number</p>
+              <p className="text-sm font-medium">{crn}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
+              <p className="text-sm font-medium">{countryOfRegistration}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">VAT Number</p>
+              <p className="text-sm font-medium">{vatNumber || '—'}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-xs text-muted-foreground mb-1">Registered Address</p>
+              <p className="text-sm font-medium flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                {formatAddress(registeredAddress)}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3" />
             <span>Added {formatDate(createdAt)}</span>
           </div>
         </div>
 
-        {/* Primary Contact - Always visible */}
-        <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-2">Primary Contact</h4>
-          <ContactRow
-            contact={primaryContact}
-            isPrimary
-            onEdit={handleEditPrimary}
-          />
-        </div>
+        {/* Divider */}
+        <div className="border-t" />
 
-        {/* Additional Contacts - Collapsible */}
-        <Collapsible open={isAdditionalOpen} onOpenChange={setIsAdditionalOpen}>
-          <CollapsibleTrigger asChild>
-            <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              <span className="flex items-center gap-2">
-                Additional Contacts
-                {additionalContacts.length > 0 && (
-                  <Badge variant="secondary" className="text-xs bg-slate-100">
-                    {additionalContacts.length}
-                  </Badge>
-                )}
-              </span>
-              <ChevronDown className={cn(
-                "h-4 w-4 transition-transform",
-                isAdditionalOpen && "rotate-180"
-              )} />
-            </button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="pt-2">
-            {additionalContacts.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4 border rounded-lg bg-slate-50">
-                No additional contacts yet.
-              </p>
-            ) : (
-              <div className="space-y-2">
-                {additionalContacts.map((contact) => (
-                  <ContactRow
-                    key={contact.id}
-                    contact={contact}
-                    onEdit={() => handleEditAdditional(contact)}
-                    onDelete={() => handleDeleteAdditional(contact.id)}
-                  />
-                ))}
-              </div>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full mt-3"
-              onClick={() => setIsAddDialogOpen(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Contact
-            </Button>
-          </CollapsibleContent>
-        </Collapsible>
+        {/* Operational Section - Editable */}
+        <div className="space-y-4">
+          {/* Primary Contact - Always visible */}
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">Primary Contact</h4>
+            <ContactRow
+              contact={primaryContact}
+              isPrimary
+              onEdit={handleEditPrimary}
+            />
+          </div>
+
+          {/* Additional Contacts - Collapsible */}
+          <Collapsible open={isAdditionalOpen} onOpenChange={setIsAdditionalOpen}>
+            <CollapsibleTrigger asChild>
+              <button className="flex items-center justify-between w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <span className="flex items-center gap-2">
+                  Additional Contacts
+                  {additionalContacts.length > 0 && (
+                    <Badge variant="secondary" className="text-xs bg-slate-100">
+                      {additionalContacts.length}
+                    </Badge>
+                  )}
+                </span>
+                <ChevronDown className={cn(
+                  "h-4 w-4 transition-transform",
+                  isAdditionalOpen && "rotate-180"
+                )} />
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2">
+              {additionalContacts.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4 border rounded-lg bg-slate-50">
+                  No additional contacts yet.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {additionalContacts.map((contact) => (
+                    <ContactRow
+                      key={contact.id}
+                      contact={contact}
+                      onEdit={() => handleEditAdditional(contact)}
+                      onDelete={() => handleDeleteAdditional(contact.id)}
+                    />
+                  ))}
+                </div>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full mt-3"
+                onClick={() => setIsAddDialogOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Contact
+              </Button>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
       </CardContent>
 
       {/* Edit Dialog */}

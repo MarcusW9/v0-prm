@@ -58,10 +58,22 @@ export interface Contact {
   roleDescription?: string // Free text for 'other' role
 }
 
+export interface RegisteredAddress {
+  line1: string
+  line2?: string
+  city: string
+  postcode: string
+  country: string
+}
+
 export interface Seller {
   id: string
+  // Legal Identity (read-only in UI)
   companyName: string
   crn: string // Company Registration Number
+  countryOfRegistration: string
+  vatNumber: string | null
+  registeredAddress: RegisteredAddress
   // Primary contact (mandatory)
   primaryContact: Contact
   // Additional contacts (optional array)

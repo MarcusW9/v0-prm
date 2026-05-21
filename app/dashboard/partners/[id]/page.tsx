@@ -236,6 +236,9 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 <ContactManagement
                   companyName={seller.companyName}
                   crn={seller.crn}
+                  countryOfRegistration={seller.countryOfRegistration}
+                  vatNumber={seller.vatNumber}
+                  registeredAddress={seller.registeredAddress}
                   createdAt={seller.createdAt}
                   primaryContact={primaryContact}
                   additionalContacts={additionalContacts}

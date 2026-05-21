@@ -6,6 +6,14 @@ export const mockSellers: Seller[] = [
     id: '1',
     companyName: 'Jessica Alderson',
     crn: '12345678',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: null,
+    registeredAddress: {
+      line1: '45 Commerce Road',
+      city: 'Manchester',
+      postcode: 'M1 4BT',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c1-1',
       name: 'Jessica Alderson',
@@ -38,6 +46,15 @@ export const mockSellers: Seller[] = [
     id: '2',
     companyName: 'Wallplus Ltd',
     crn: '23456789',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB123456789',
+    registeredAddress: {
+      line1: '12 Industrial Estate',
+      line2: 'Unit 5',
+      city: 'Birmingham',
+      postcode: 'B1 2AA',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c2-1',
       name: 'Keith Teh',
@@ -77,6 +94,14 @@ export const mockSellers: Seller[] = [
     id: '3',
     companyName: 'Home Discount Ltd',
     crn: '34567890',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB234567890',
+    registeredAddress: {
+      line1: '78 Retail Park',
+      city: 'Leeds',
+      postcode: 'LS1 5PQ',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c3-1',
       name: 'Raj Handa',
@@ -123,6 +148,14 @@ export const mockSellers: Seller[] = [
     id: '4',
     companyName: 'The Mia Home Ltd',
     crn: '45678901',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB345678901',
+    registeredAddress: {
+      line1: '23 Furniture Lane',
+      city: 'Sheffield',
+      postcode: 'S1 2AB',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c4-1',
       name: 'Ahmet Ozgul',
@@ -155,6 +188,14 @@ export const mockSellers: Seller[] = [
     id: '5',
     companyName: 'Select International Products',
     crn: '56789012',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB456789012',
+    registeredAddress: {
+      line1: '56 Technology Park',
+      city: 'Bristol',
+      postcode: 'BS1 6YZ',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c5-1',
       name: 'Sarah Walker',
@@ -195,6 +236,14 @@ export const mockSellers: Seller[] = [
     id: '6',
     companyName: 'Trimetals Ltd',
     crn: '67890123',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB567890123',
+    registeredAddress: {
+      line1: '89 Metal Works',
+      city: 'Newcastle',
+      postcode: 'NE1 4AA',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c6-1',
       name: 'Tim Smith',
@@ -226,6 +275,14 @@ export const mockSellers: Seller[] = [
     id: '7',
     companyName: 'Example Partner Ltd',
     crn: '78901234',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: null,
+    registeredAddress: {
+      line1: '10 Example Street',
+      city: 'London',
+      postcode: 'EC1A 1BB',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c7-1',
       name: 'Contact Person',
@@ -258,6 +315,14 @@ export const mockSellers: Seller[] = [
     id: '8',
     companyName: 'Artemis Home Ltd',
     crn: '89012345',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB678901234',
+    registeredAddress: {
+      line1: '34 Home Furnishings Way',
+      city: 'Liverpool',
+      postcode: 'L1 0AA',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c8-1',
       name: 'Luke Mildren',
@@ -304,6 +369,14 @@ export const mockSellers: Seller[] = [
     id: '9',
     companyName: 'Comfy Deluxe',
     crn: '90123456',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB789012345',
+    registeredAddress: {
+      line1: '67 Comfort House',
+      city: 'Edinburgh',
+      postcode: 'EH1 1YZ',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c9-1',
       name: 'Nasar Ali',
@@ -335,6 +408,14 @@ export const mockSellers: Seller[] = [
     id: '10',
     companyName: 'Ledvance Ltd',
     crn: '01234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB890123456',
+    registeredAddress: {
+      line1: '90 Lighting Centre',
+      city: 'Cardiff',
+      postcode: 'CF1 1AA',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c10-1',
       name: 'Peter Alexander',
@@ -374,6 +455,14 @@ export const mockSellers: Seller[] = [
     id: '11',
     companyName: 'MuchV',
     crn: '11234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: null,
+    registeredAddress: {
+      line1: '12 Toy Town',
+      city: 'Glasgow',
+      postcode: 'G1 2PP',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c11-1',
       name: 'Pauline Mucha',
@@ -405,6 +494,14 @@ export const mockSellers: Seller[] = [
     id: '12',
     companyName: 'Q RETAIL STORES LIMITED T/A DIBOR',
     crn: '12234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB901234567',
+    registeredAddress: {
+      line1: '45 Q Retail House',
+      city: 'Belfast',
+      postcode: 'BT1 3QQ',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c12-1',
       name: 'SAMEER SHARMA',
@@ -436,6 +533,14 @@ export const mockSellers: Seller[] = [
     id: '13',
     companyName: 'Snug City',
     crn: '13234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB012345678',
+    registeredAddress: {
+      line1: '78 Snug Comfort Park',
+      city: 'Nottingham',
+      postcode: 'NG1 5FF',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c13-1',
       name: 'Aqeel Ahmed',
@@ -475,6 +580,14 @@ export const mockSellers: Seller[] = [
     id: '14',
     companyName: 'Zebedee Any Angle Ltd',
     crn: '14234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB112345678',
+    registeredAddress: {
+      line1: '101 Zebedee Way',
+      city: 'Oxford',
+      postcode: 'OX1 2AB',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c14-1',
       name: 'Diane Challender',
@@ -507,6 +620,14 @@ export const mockSellers: Seller[] = [
     id: '15',
     companyName: 'Garden Trading Co',
     crn: '15234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB212345678',
+    registeredAddress: {
+      line1: '55 Garden Trading Estate',
+      city: 'Cambridge',
+      postcode: 'CB1 9HH',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c15-1',
       name: 'Emma Richards',
@@ -553,6 +674,14 @@ export const mockSellers: Seller[] = [
     id: '16',
     companyName: 'Modern Furniture Direct',
     crn: '16234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB312345678',
+    registeredAddress: {
+      line1: '88 Modern Furniture Plaza',
+      city: 'Southampton',
+      postcode: 'SO1 0AA',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c16-1',
       name: 'James Cooper',
@@ -592,6 +721,14 @@ export const mockSellers: Seller[] = [
     id: '17',
     companyName: 'Outdoor Living Essentials',
     crn: '17234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB412345678',
+    registeredAddress: {
+      line1: '22 Outdoor Living Park',
+      city: 'Brighton',
+      postcode: 'BN1 1GG',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c17-1',
       name: 'Sophie Martin',
@@ -623,6 +760,14 @@ export const mockSellers: Seller[] = [
     id: '18',
     companyName: 'Kitchen Warehouse UK',
     crn: '18234567',
+    countryOfRegistration: 'United Kingdom',
+    vatNumber: 'GB512345678',
+    registeredAddress: {
+      line1: '33 Kitchen Warehouse Road',
+      city: 'Reading',
+      postcode: 'RG1 7KK',
+      country: 'United Kingdom',
+    },
     primaryContact: {
       id: 'c18-1',
       name: 'David Brown',
