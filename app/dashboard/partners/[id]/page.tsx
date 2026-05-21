@@ -358,12 +358,14 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
         <div className="flex flex-1 overflow-hidden">
           {/* Left Sidebar - Supplier Details */}
           <div className={cn(
-            "flex flex-col border-r bg-slate-100 transition-all duration-300 overflow-hidden",
+            "flex flex-col border-r bg-slate-100 transition-all duration-300",
             isSidebarExpanded ? "w-72" : "w-16"
           )}>
-            {/* Supplier Details - Only when expanded */}
-            {isSidebarExpanded && (
-              <div className="flex-1 overflow-y-auto">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Supplier Details - Only when expanded */}
+              {isSidebarExpanded && (
+                <>
                 {/* Company Name Header */}
                 <div className="p-4 border-b">
                   <h2 className="font-semibold text-base">{seller.companyName}</h2>
@@ -567,11 +569,12 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                   )}
                 </div>
               </div>
+              </>
+              )}
             </div>
-          )}
 
           {/* Collapse/Expand Toggle - Fixed at bottom of sidebar */}
-          <div className="mt-auto border-t p-2 bg-slate-100 flex-shrink-0">
+          <div className="border-t p-2 bg-slate-100 flex-shrink-0">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
