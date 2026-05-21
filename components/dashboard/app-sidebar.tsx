@@ -224,10 +224,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="bg-slate-800 p-4">
+      <SidebarFooter className="bg-slate-800 p-4 group-data-[collapsible=icon]:p-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left hover:bg-slate-700">
+            <button className="flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left hover:bg-slate-700 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2">
               <Avatar className="h-8 w-8 flex-shrink-0 bg-teal-600">
                 <AvatarFallback className="bg-teal-600 text-xs text-white">
                   T
