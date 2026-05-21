@@ -66,6 +66,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { StageChecklists, hasIncompleteItems } from '@/components/partner/stage-checklists'
@@ -127,6 +136,10 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const [activeTab, setActiveTab] = useState('overview')
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true)
   const [newNote, setNewNote] = useState('')
+  
+  // Terminate confirmation dialog state
+  const [showTerminateDialog, setShowTerminateDialog] = useState(false)
+  const [terminateConfirmText, setTerminateConfirmText] = useState('')
   
   // Drag and drop for overview sections
   const [sectionOrder, setSectionOrder] = useState([
@@ -1077,7 +1090,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                             <Button 
                               variant="outline" 
                               className="border-amber-300 text-amber-700 hover:bg-amber-50"
-                              onClick={() => toast.info('Confirmation required before changing status')}
+                              onClick={() => toast.success('Seller marked as delayed')}
                             >
                               <Clock className="h-4 w-4 mr-2" />
                               Mark as Delayed
@@ -1126,7 +1139,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                             <Button 
                               variant="outline" 
                               className="border-red-300 text-red-700 hover:bg-red-50"
-                              onClick={() => toast.info('Confirmation required before changing status')}
+                              onClick={() => setShowTerminateDialog(true)}
                             >
                               <Ban className="h-4 w-4 mr-2" />
                               Mark as Terminated
@@ -1157,6 +1170,57 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           incompleteItems={incompleteItems}
           onConfirm={handleConfirmIncompleteMove}
         />
+
+        {/* Terminate Confirmation Dialog */}
+        <Dialog open={showTerminateDialog} onOpenChange={(open) => {
+          setShowTerminateDialog(open)
+          if (!open) setTerminateConfirmText('')
+        }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-red-700 flex items-center gap-2">
+                <Ban className="h-5 w-5" />
+                Confirm Termination
+              </DialogTitle>
+              <DialogDescription>
+                This action will permanently terminate the seller relationship with <span className="font-semibold">{seller.companyName}</span>. This cannot be easily undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-muted-foreground">
+                To confirm, please type <span className="font-mono font-semibold text-red-600">terminate</span> below:
+              </p>
+              <Input
+                value={terminateConfirmText}
+                onChange={(e) => setTerminateConfirmText(e.target.value)}
+                placeholder="Type 'terminate' to confirm"
+                className="font-mono"
+              />
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowTerminateDialog(false)
+                  setTerminateConfirmText('')
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                disabled={terminateConfirmText.toLowerCase() !== 'terminate'}
+                onClick={() => {
+                  toast.success('Seller has been terminated')
+                  setShowTerminateDialog(false)
+                  setTerminateConfirmText('')
+                }}
+              >
+                Terminate Seller
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Tabs>
     </TooltipProvider>
   )
