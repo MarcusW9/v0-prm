@@ -693,8 +693,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                             )
                           case 'contact-details':
                             return (
-                              <SortableCard key={sectionId} id={sectionId}>
-                                <div className="h-full">
+                              <SortableCard key={sectionId} id={sectionId} isFullWidth>
+                                <div className="">
                                   <ContactManagement
                                     companyName={seller.companyName}
                                     crn={seller.crn}
