@@ -204,25 +204,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="h-6 w-px bg-border" />
-            <h1 className="font-semibold text-base">{seller.companyName}</h1>
-            {stageDefinition && (
-              <Badge
-                variant="secondary"
-                className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0 text-xs')}
-              >
-                {stageDefinition.label}
-              </Badge>
-            )}
-            {seller.priorityScore !== null && (
-              <span className={cn(
-                "text-xs font-semibold px-1.5 py-0.5 rounded",
-                priorityColors.bg,
-                priorityColors.text
-              )}>
-                {seller.priorityScore.toFixed(1)}
-              </span>
-            )}
-            <div className="h-6 w-px bg-border ml-2" />
             <TabsList className="h-14 bg-transparent p-0 gap-1">
               <TabsTrigger 
                 value="overview" 
@@ -283,13 +264,32 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
             {/* Supplier Details - Only when expanded */}
             {isSidebarExpanded && (
               <div className="flex-1 overflow-y-auto">
-                {/* Contact Details Section */}
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Contact Details</span>
+                {/* Company Name Header */}
+                <div className="p-4 border-b">
+                  <h2 className="font-semibold text-base">{seller.companyName}</h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    {stageDefinition && (
+                      <Badge
+                        variant="secondary"
+                        className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0 text-xs')}
+                      >
+                        {stageDefinition.label}
+                      </Badge>
+                    )}
+                    {seller.priorityScore !== null && (
+                      <span className={cn(
+                        "text-xs font-semibold px-1.5 py-0.5 rounded",
+                        priorityColors.bg,
+                        priorityColors.text
+                      )}>
+                        {seller.priorityScore.toFixed(1)}
+                      </span>
+                    )}
                   </div>
-                  
+                </div>
+
+                {/* Contact Info */}
+                <div className="p-4">
                   <div className="space-y-3">
                     {seller.websiteUrl && (
                       <div>
