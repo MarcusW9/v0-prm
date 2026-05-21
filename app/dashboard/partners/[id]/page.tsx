@@ -1211,9 +1211,12 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 variant="destructive"
                 disabled={terminateConfirmText.toLowerCase() !== 'terminate'}
                 onClick={() => {
+                  setSellerStatus('terminated')
                   toast.success('Seller has been terminated')
                   setShowTerminateDialog(false)
                   setTerminateConfirmText('')
+                  setTerminateReason('')
+                  setTerminateNotes('')
                 }}
               >
                 Terminate Seller
