@@ -414,11 +414,11 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Primary Contact</p>
-                      <p className="text-sm font-medium">{seller.primaryContact.name}</p>
+                      <p className="text-sm font-medium">{primaryContact.name}</p>
                       <div className="flex items-center gap-1.5 group/email">
-                        <p className="text-xs text-muted-foreground">{seller.primaryContact.email}</p>
+                        <p className="text-xs text-muted-foreground">{primaryContact.email}</p>
                         <button
-                          onClick={() => copyToClipboard(seller.primaryContact.email, 'email')}
+                          onClick={() => copyToClipboard(primaryContact.email, 'email')}
                           className="opacity-0 group-hover/email:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
                           aria-label="Copy email"
                         >
@@ -431,13 +431,13 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       </div>
                     </div>
                     
-                    {seller.primaryContact.phone && (
+                    {primaryContact.phone && (
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Phone</p>
                         <div className="flex items-center gap-1.5 group/phone">
-                          <p className="text-sm font-medium">{seller.primaryContact.phone}</p>
+                          <p className="text-sm font-medium">{primaryContact.phone}</p>
                           <button
-                            onClick={() => copyToClipboard(seller.primaryContact.phone!, 'phone')}
+                            onClick={() => copyToClipboard(primaryContact.phone!, 'phone')}
                             className="opacity-0 group-hover/phone:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
                             aria-label="Copy phone"
                           >
