@@ -450,6 +450,24 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     </Card>
                   </div>
 
+                  {/* Contact Details - Full width */}
+                  <div className="lg:col-span-2">
+                    <ContactManagement
+                      companyName={seller.companyName}
+                      crn={seller.crn}
+                      countryOfRegistration={seller.countryOfRegistration}
+                      vatNumber={seller.vatNumber}
+                      registeredAddress={seller.registeredAddress}
+                      createdAt={seller.createdAt}
+                      websiteUrl={seller.websiteUrl}
+                      primaryContact={primaryContact}
+                      additionalContacts={additionalContacts}
+                      onPrimaryContactChange={setPrimaryContact}
+                      onAdditionalContactsChange={setAdditionalContacts}
+                      showLegalIdentity={false}
+                    />
+                  </div>
+
                   {/* Assignment */}
                   <Card>
                     <CardHeader className="pb-3">
@@ -506,24 +524,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       </div>
                     </CardContent>
                   </Card>
-
-                  {/* Contact Details - Full width */}
-                  <div className="lg:col-span-2">
-                    <ContactManagement
-                      companyName={seller.companyName}
-                      crn={seller.crn}
-                      countryOfRegistration={seller.countryOfRegistration}
-                      vatNumber={seller.vatNumber}
-                      registeredAddress={seller.registeredAddress}
-                      createdAt={seller.createdAt}
-                      websiteUrl={seller.websiteUrl}
-                      primaryContact={primaryContact}
-                      additionalContacts={additionalContacts}
-                      onPrimaryContactChange={setPrimaryContact}
-                      onAdditionalContactsChange={setAdditionalContacts}
-                      showLegalIdentity={false}
-                    />
-                  </div>
 
                   {/* Compliance Checks */}
                   <Card>
