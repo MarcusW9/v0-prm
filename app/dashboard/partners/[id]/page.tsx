@@ -129,7 +129,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const [sectionOrder, setSectionOrder] = useState([
     'supplier-details',
     'business-metrics',
-    'contact-details',
+    'contact-details', 
     'assignment',
     'compliance-checks',
   ])
