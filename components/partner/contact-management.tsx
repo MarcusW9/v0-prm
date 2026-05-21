@@ -45,6 +45,8 @@ interface ContactManagementProps {
   additionalContacts: Contact[]
   onPrimaryContactChange?: (contact: Contact) => void
   onAdditionalContactsChange?: (contacts: Contact[]) => void
+  // Display options
+  showLegalIdentity?: boolean
 }
 
 const getRoleBadgeColor = (role: ContactRole) => {
@@ -261,6 +263,7 @@ export function ContactManagement({
   additionalContacts,
   onPrimaryContactChange,
   onAdditionalContactsChange,
+  showLegalIdentity = true,
 }: ContactManagementProps) {
   const [isAdditionalOpen, setIsAdditionalOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
@@ -322,6 +325,7 @@ export function ContactManagement({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Legal Identity Section - Read Only */}
+        {showLegalIdentity && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Lock className="h-3 w-3" />
@@ -359,9 +363,10 @@ export function ContactManagement({
             <span>Added {formatDate(createdAt)}</span>
           </div>
         </div>
+        )}
 
         {/* Divider */}
-        <div className="border-t" />
+        {showLegalIdentity && <div className="border-t" />}
 
         {/* Operational Section - Editable */}
         <div className="space-y-4">

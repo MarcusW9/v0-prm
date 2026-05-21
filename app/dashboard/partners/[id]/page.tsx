@@ -13,12 +13,14 @@ import {
   Upload, 
   FileText, 
   FileSpreadsheet,
-  LayoutDashboard,
-  ClipboardCheck,
-  StickyNote,
-  FolderOpen,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Building2,
+  MapPin,
+  FileCheck,
+  Globe,
+  Calendar,
+  Lock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Select,
   SelectContent,
@@ -50,18 +53,11 @@ interface PartnerDetailPageProps {
   params: Promise<{ id: string }>
 }
 
-const navItems = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'checklist', label: 'Checklist', icon: ClipboardCheck },
-  { id: 'notes', label: 'Notes', icon: StickyNote },
-  { id: 'files', label: 'Files', icon: FolderOpen },
-]
-
 export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const { id } = use(params)
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState('overview')
-  const [isNavExpanded, setIsNavExpanded] = useState(true)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true)
   const [newNote, setNewNote] = useState('')
   
   // Find seller
@@ -184,428 +180,498 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
     setShowIncompleteDialog(false)
   }
 
+  const formatAddress = (address: typeof seller.registeredAddress) => {
+    const parts = [address.line1]
+    if (address.line2) parts.push(address.line2)
+    parts.push(address.city)
+    parts.push(address.postcode)
+    return parts.join(', ')
+  }
+
   return (
     <TooltipProvider>
       <div className="flex h-full">
-        {/* Left Hand Navigation */}
+        {/* Left Sidebar - Supplier Details */}
         <div className={cn(
-          "flex flex-col border-r bg-slate-50 transition-all duration-300",
-          isNavExpanded ? "w-64" : "w-16"
+          "flex flex-col border-r bg-slate-50 transition-all duration-300 overflow-hidden",
+          isSidebarExpanded ? "w-72" : "w-16"
         )}>
-          {/* Seller Identity Card */}
+          {/* Header with Company Avatar */}
           <div className="border-b p-4">
             <div className="flex items-center gap-3">
               <Avatar className={cn(
-                "bg-slate-200 flex-shrink-0",
-                isNavExpanded ? "h-10 w-10" : "h-8 w-8"
+                "bg-slate-700 flex-shrink-0",
+                isSidebarExpanded ? "h-12 w-12" : "h-10 w-10"
               )}>
-                <AvatarFallback className="text-slate-600 text-sm font-medium">
+                <AvatarFallback className="text-white text-sm font-medium">
                   {seller.companyName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
-              {isNavExpanded && (
+              {isSidebarExpanded && (
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-semibold text-sm truncate">{seller.companyName}</h2>
-                  <p className="text-xs text-muted-foreground truncate">CRN: {seller.crn}</p>
+                  <h2 className="font-semibold text-base truncate">{seller.companyName}</h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    {stageDefinition && (
+                      <Badge
+                        variant="secondary"
+                        className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0 text-xs')}
+                      >
+                        {stageDefinition.label}
+                      </Badge>
+                    )}
+                    {seller.priorityScore !== null && (
+                      <span className={cn(
+                        "text-xs font-semibold px-1.5 py-0.5 rounded",
+                        priorityColors.bg,
+                        priorityColors.text
+                      )}>
+                        {seller.priorityScore.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-            
-            {isNavExpanded && (
-              <div className="mt-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Priority</span>
-                  {seller.priorityScore !== null ? (
-                    <span className={cn(
-                      "text-xs font-semibold px-2 py-0.5 rounded",
-                      priorityColors.bg,
-                      priorityColors.text
-                    )}>
-                      {seller.priorityScore.toFixed(1)}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">N/A</span>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Stage</span>
-                  {stageDefinition && (
-                    <Badge
-                      variant="secondary"
-                      className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0 text-xs')}
-                    >
-                      {stageDefinition.label}
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Country</span>
-                  <span className="text-xs">{seller.countryOfRegistration}</span>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Navigation Items */}
-          <nav className="flex-1 p-2 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon
-              const isActive = activeSection === item.id
-              const count = item.id === 'notes' ? sellerNotes.length : item.id === 'files' ? sellerFiles.length : null
-              
-              const button = (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                    isActive 
-                      ? "bg-slate-200 text-slate-900 font-medium" 
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          {/* Supplier Details - Only when expanded */}
+          {isSidebarExpanded && (
+            <div className="flex-1 overflow-y-auto">
+              {/* Legal Identity Section */}
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Legal Identity</span>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Company Reg. Number</p>
+                      <p className="text-sm font-medium">{seller.crn}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Globe className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Country of Registration</p>
+                      <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
+                    </div>
+                  </div>
+                  
+                  {seller.vatNumber && (
+                    <div className="flex items-start gap-3">
+                      <FileCheck className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">VAT Number</p>
+                        <p className="text-sm font-medium">{seller.vatNumber}</p>
+                      </div>
+                    </div>
                   )}
-                >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
-                  {isNavExpanded && (
-                    <>
-                      <span className="flex-1 text-left">{item.label}</span>
-                      {count !== null && count > 0 && (
-                        <span className="text-xs bg-slate-300 text-slate-700 px-1.5 py-0.5 rounded">
-                          {count}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </button>
-              )
+                  
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Registered Address</p>
+                      <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Added to System</p>
+                      <p className="text-sm font-medium">{formatDate(seller.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              if (!isNavExpanded) {
-                return (
-                  <Tooltip key={item.id}>
-                    <TooltipTrigger asChild>
-                      {button}
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      {item.label}
-                      {count !== null && count > 0 && ` (${count})`}
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              }
+              <Separator />
 
-              return button
-            })}
-          </nav>
+              {/* Assignment Section */}
+              <div className="p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Assignment</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
+                    <Select defaultValue={seller.acquisitionManager || undefined}>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue placeholder="Not assigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {acquisitionManagers.map((manager) => (
+                          <SelectItem key={manager} value={manager}>
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
+                    <Select defaultValue={seller.onboardingManager || undefined}>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue placeholder="Not assigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {onboardingManagers.map((manager) => (
+                          <SelectItem key={manager} value={manager}>
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
+                    <Select defaultValue={seller.accountManager || undefined}>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue placeholder="Not assigned" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accountManagers.map((manager) => (
+                          <SelectItem key={manager} value={manager}>
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Quick Stats */}
+              <div className="p-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Activity</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white rounded-lg p-3 border">
+                    <p className="text-2xl font-semibold">{sellerNotes.length}</p>
+                    <p className="text-xs text-muted-foreground">Notes</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border">
+                    <p className="text-2xl font-semibold">{sellerFiles.length}</p>
+                    <p className="text-xs text-muted-foreground">Files</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Collapse/Expand Toggle */}
-          <div className="border-t p-2">
-            <button
-              onClick={() => setIsNavExpanded(!isNavExpanded)}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-            >
-              {isNavExpanded ? (
-                <>
-                  <ChevronLeft className="h-4 w-4" />
-                  <span>Collapse</span>
-                </>
-              ) : (
-                <ChevronRight className="h-4 w-4" />
+          <div className="border-t p-2 mt-auto">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                >
+                  {isSidebarExpanded ? (
+                    <>
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>Collapse</span>
+                    </>
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              {!isSidebarExpanded && (
+                <TooltipContent side="right">Expand sidebar</TooltipContent>
               )}
-            </button>
+            </Tooltip>
           </div>
         </div>
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
+          {/* Header with Back Button and Stage Selector */}
           <div className="border-b bg-background px-6 py-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.back()}
-                className="h-8 w-8"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div className="flex flex-1 items-center justify-between">
-                <h1 className="text-lg font-semibold capitalize">{activeSection}</h1>
-                <div className="flex items-center gap-3">
-                  <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
-                    <SelectTrigger className="w-44">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {acquisitionStages.map((stage) => (
-                        <SelectItem key={stage.id} value={stage.id}>
-                          {stage.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.back()}
+                  className="h-8 w-8"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div>
+                  <h1 className="text-lg font-semibold">{seller.companyName}</h1>
+                  <p className="text-sm text-muted-foreground">Partner Profile</p>
                 </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground">Stage:</span>
+                <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {acquisitionStages.map((stage) => (
+                      <SelectItem key={stage.id} value={stage.id}>
+                        {stage.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {activeSection === 'overview' && (
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Company Information with Contacts - Full width */}
-                <div className="lg:col-span-2">
-                  <ContactManagement
-                    companyName={seller.companyName}
-                    crn={seller.crn}
-                    countryOfRegistration={seller.countryOfRegistration}
-                    vatNumber={seller.vatNumber}
-                    registeredAddress={seller.registeredAddress}
-                    createdAt={seller.createdAt}
-                    primaryContact={primaryContact}
-                    additionalContacts={additionalContacts}
-                    onPrimaryContactChange={setPrimaryContact}
-                    onAdditionalContactsChange={setAdditionalContacts}
-                  />
-                </div>
+          {/* Tabs Navigation */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+            <div className="border-b bg-background px-6">
+              <TabsList className="h-12 w-auto bg-transparent p-0 gap-6">
+                <TabsTrigger 
+                  value="overview" 
+                  className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="checklist"
+                  className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                >
+                  Checklist
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="notes"
+                  className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                >
+                  Notes
+                  {sellerNotes.length > 0 && (
+                    <span className="ml-2 text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">
+                      {sellerNotes.length}
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="files"
+                  className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                >
+                  Files
+                  {sellerFiles.length > 0 && (
+                    <span className="ml-2 text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">
+                      {sellerFiles.length}
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-                {/* Assignment */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Assignment</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
-                      <Select defaultValue={seller.acquisitionManager || undefined}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Not assigned" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {acquisitionManagers.map((manager) => (
-                            <SelectItem key={manager} value={manager}>
-                              {manager}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
-                      <Select defaultValue={seller.onboardingManager || undefined}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Not assigned" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {onboardingManagers.map((manager) => (
-                            <SelectItem key={manager} value={manager}>
-                              {manager}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
-                      <Select defaultValue={seller.accountManager || undefined}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Not assigned" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {accountManagers.map((manager) => (
-                            <SelectItem key={manager} value={manager}>
-                              {manager}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <TabsContent value="overview" className="mt-0 h-full">
+                <div className="grid gap-6 lg:grid-cols-2">
+                  {/* Contacts - Full width */}
+                  <div className="lg:col-span-2">
+                    <ContactManagement
+                      companyName={seller.companyName}
+                      crn={seller.crn}
+                      countryOfRegistration={seller.countryOfRegistration}
+                      vatNumber={seller.vatNumber}
+                      registeredAddress={seller.registeredAddress}
+                      createdAt={seller.createdAt}
+                      primaryContact={primaryContact}
+                      additionalContacts={additionalContacts}
+                      onPrimaryContactChange={setPrimaryContact}
+                      onAdditionalContactsChange={setAdditionalContacts}
+                      showLegalIdentity={false}
+                    />
+                  </div>
 
-                {/* Business Assessment */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Business Assessment</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
-                      <Select defaultValue={seller.gmvPotential || undefined}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select GMV potential" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">Low</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="high">High</SelectItem>
-                          <SelectItem value="very-high">Very High</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {seller.priorityScore !== null && (
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
-                        <p className="text-sm font-medium">{seller.priorityScore.toFixed(1)} / 5.0</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Compliance Checks */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Compliance Checks</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      {seller.companiesHousePass ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-muted-foreground" />
-                      )}
-                      <span className="text-sm">Companies House Pass</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {seller.dnbPass ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-muted-foreground" />
-                      )}
-                      <span className="text-sm">D&B Pass</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Rejection Reason (if applicable) */}
-                {seller.rejectionReason && (
-                  <Card className="md:col-span-2">
+                  {/* Business Assessment */}
+                  <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-base text-red-600">Rejection Reason</CardTitle>
+                      <CardTitle className="text-base">Business Assessment</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-red-600 bg-red-50 rounded-md p-3">
-                        {seller.rejectionReason}
-                      </p>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
+                        <Select defaultValue={seller.gmvPotential || undefined}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select GMV potential" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="very-high">Very High</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {seller.priorityScore !== null && (
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
+                          <p className="text-sm font-medium">{seller.priorityScore.toFixed(1)} / 5.0</p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
-                )}
-              </div>
-            )}
 
-            {activeSection === 'checklist' && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Pipeline Progress</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Complete the checklist items as you progress through each stage
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <StageChecklists
-                    currentStage={currentStage}
-                    currentPipeline={seller.pipeline}
-                    checklistProgress={checklistProgress}
-                    onItemChange={handleChecklistItemChange}
-                  />
-                </CardContent>
-              </Card>
-            )}
+                  {/* Compliance Checks */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Compliance Checks</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        {seller.companiesHousePass ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <span className="text-sm">Companies House Pass</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {seller.dnbPass ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <span className="text-sm">D&B Pass</span>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            {activeSection === 'notes' && (
-              <Card>
-                <CardContent className="pt-6">
-                  {/* Add New Note */}
-                  <div className="space-y-3 mb-6">
-                    <Textarea
-                      placeholder="Add a note..."
-                      value={newNote}
-                      onChange={(e) => setNewNote(e.target.value)}
-                      rows={3}
-                      className="resize-none"
+                  {/* Rejection Reason (if applicable) */}
+                  {seller.rejectionReason && (
+                    <Card className="lg:col-span-2">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base text-red-600">Rejection Reason</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-red-600 bg-red-50 rounded-md p-3">
+                          {seller.rejectionReason}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="checklist" className="mt-0 h-full">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Pipeline Progress</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Complete the checklist items as you progress through each stage
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <StageChecklists
+                      currentStage={currentStage}
+                      currentPipeline={seller.pipeline}
+                      checklistProgress={checklistProgress}
+                      onItemChange={handleChecklistItemChange}
                     />
-                    <Button onClick={handleAddNote} size="sm">
-                      Add Note
-                    </Button>
-                  </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                  <Separator className="my-6" />
+              <TabsContent value="notes" className="mt-0 h-full">
+                <Card>
+                  <CardContent className="pt-6">
+                    {/* Add New Note */}
+                    <div className="space-y-3 mb-6">
+                      <Textarea
+                        placeholder="Add a note..."
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                        rows={3}
+                        className="resize-none"
+                      />
+                      <Button onClick={handleAddNote} size="sm">
+                        Add Note
+                      </Button>
+                    </div>
 
-                  {/* Notes List */}
-                  <div className="space-y-4">
-                    {sellerNotes.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-4">
-                        No notes yet. Add the first note above.
-                      </p>
-                    ) : (
-                      sellerNotes
-                        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-                        .map((note) => (
-                          <div key={note.id} className="flex gap-3">
-                            <Avatar className="h-8 w-8 flex-shrink-0">
-                              <AvatarFallback className="bg-muted text-xs">
-                                {note.authorInitials}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">{note.authorName}</span>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatDateTime(note.createdAt)}
-                                </span>
+                    <Separator className="my-6" />
+
+                    {/* Notes List */}
+                    <div className="space-y-4">
+                      {sellerNotes.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          No notes yet. Add the first note above.
+                        </p>
+                      ) : (
+                        sellerNotes
+                          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+                          .map((note) => (
+                            <div key={note.id} className="flex gap-3">
+                              <Avatar className="h-8 w-8 flex-shrink-0">
+                                <AvatarFallback className="bg-muted text-xs">
+                                  {note.authorInitials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium">{note.authorName}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDateTime(note.createdAt)}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{note.content}</p>
                               </div>
-                              <p className="text-sm text-muted-foreground">{note.content}</p>
                             </div>
+                          ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="files" className="mt-0 h-full">
+                <Card>
+                  <CardContent className="pt-6">
+                    {/* Upload Area */}
+                    <div
+                      className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted p-8 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors mb-6"
+                      onClick={() => toast.success('File upload functionality coming soon')}
+                    >
+                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="text-sm font-medium">Click to upload or drag and drop</p>
+                      <p className="text-xs text-muted-foreground mt-1">PDF, DOC, XLS up to 10MB</p>
+                    </div>
+
+                    {/* Files List */}
+                    <div className="space-y-2">
+                      {sellerFiles.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          No files uploaded yet.
+                        </p>
+                      ) : (
+                        sellerFiles.map((file) => (
+                          <div
+                            key={file.id}
+                            className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted/50 transition-colors"
+                          >
+                            {getFileIcon(file.fileType)}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{file.fileName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatFileSize(file.fileSize)} • Uploaded by {file.uploadedBy} on{' '}
+                                {formatDate(file.uploadedAt)}
+                              </p>
+                            </div>
+                            <Button variant="ghost" size="sm">
+                              Download
+                            </Button>
                           </div>
                         ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSection === 'files' && (
-              <Card>
-                <CardContent className="pt-6">
-                  {/* Upload Area */}
-                  <div
-                    className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted p-8 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors mb-6"
-                    onClick={() => toast.success('File upload functionality coming soon')}
-                  >
-                    <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-sm font-medium">Click to upload or drag and drop</p>
-                    <p className="text-xs text-muted-foreground mt-1">PDF, DOC, XLS up to 10MB</p>
-                  </div>
-
-                  {/* Files List */}
-                  <div className="space-y-2">
-                    {sellerFiles.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-4">
-                        No files uploaded yet.
-                      </p>
-                    ) : (
-                      sellerFiles.map((file) => (
-                        <div
-                          key={file.id}
-                          className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted/50 transition-colors"
-                        >
-                          {getFileIcon(file.fileType)}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{file.fileName}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatFileSize(file.fileSize)} • Uploaded by {file.uploadedBy} on{' '}
-                              {formatDate(file.uploadedAt)}
-                            </p>
-                          </div>
-                          <Button variant="ghost" size="sm">
-                            Download
-                          </Button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </div>
+          </Tabs>
         </div>
 
         {/* Incomplete Checklist Dialog */}
