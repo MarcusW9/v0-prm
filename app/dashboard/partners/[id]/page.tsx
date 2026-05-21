@@ -192,60 +192,100 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
   return (
     <TooltipProvider>
-      <div className="flex h-full">
-        {/* Left Sidebar - Supplier Details */}
-        <div className={cn(
-          "flex flex-col border-r bg-slate-50 transition-all duration-300 overflow-hidden",
-          isSidebarExpanded ? "w-72" : "w-16"
-        )}>
-          {/* Header with Company Name */}
-          <div className="border-b p-4">
-            {isSidebarExpanded ? (
-              <div>
-                <h2 className="font-semibold text-base truncate">{seller.companyName}</h2>
-                <div className="flex items-center gap-2 mt-1">
-                  {stageDefinition && (
-                    <Badge
-                      variant="secondary"
-                      className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0 text-xs')}
-                    >
-                      {stageDefinition.label}
-                    </Badge>
-                  )}
-                  {seller.priorityScore !== null && (
-                    <span className={cn(
-                      "text-xs font-semibold px-1.5 py-0.5 rounded",
-                      priorityColors.bg,
-                      priorityColors.text
-                    )}>
-                      {seller.priorityScore.toFixed(1)}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center justify-center">
-                    <span className={cn(
-                      "text-xs font-semibold px-1.5 py-0.5 rounded",
-                      priorityColors.bg,
-                      priorityColors.text
-                    )}>
-                      {seller.priorityScore !== null ? seller.priorityScore.toFixed(1) : '—'}
-                    </span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">{seller.companyName}</TooltipContent>
-              </Tooltip>
+      {/* Full-width Top Bar */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+        <div className="border-b bg-background px-4 h-14 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="h-6 w-px bg-border" />
+            <h1 className="font-semibold text-base">{seller.companyName}</h1>
+            {stageDefinition && (
+              <Badge
+                variant="secondary"
+                className={cn(stageDefinition.bgColor, stageDefinition.color, 'border-0 text-xs')}
+              >
+                {stageDefinition.label}
+              </Badge>
             )}
+            {seller.priorityScore !== null && (
+              <span className={cn(
+                "text-xs font-semibold px-1.5 py-0.5 rounded",
+                priorityColors.bg,
+                priorityColors.text
+              )}>
+                {seller.priorityScore.toFixed(1)}
+              </span>
+            )}
+            <div className="h-6 w-px bg-border ml-2" />
+            <TabsList className="h-14 bg-transparent p-0 gap-1">
+              <TabsTrigger 
+                value="overview" 
+                className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger 
+                value="checklist"
+                className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
+              >
+                Checklist
+              </TabsTrigger>
+              <TabsTrigger 
+                value="notes"
+                className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
+              >
+                Notes
+                {sellerNotes.length > 0 && (
+                  <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-normal">
+                    {sellerNotes.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="files"
+                className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
+              >
+                Files
+                {sellerFiles.length > 0 && (
+                  <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-normal">
+                    {sellerFiles.length}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
           </div>
+          <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
+            <SelectTrigger className="w-40 h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {acquisitionStages.map((stage) => (
+                <SelectItem key={stage.id} value={stage.id}>
+                  {stage.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Supplier Details - Only when expanded */}
-          {isSidebarExpanded && (
-            <div className="flex-1 overflow-y-auto">
-              {/* Business Details Section */}
-              <div className="p-4">
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left Sidebar - Supplier Details */}
+          <div className={cn(
+            "flex flex-col border-r bg-slate-50 transition-all duration-300 overflow-hidden",
+            isSidebarExpanded ? "w-72" : "w-16"
+          )}>
+            {/* Supplier Details - Only when expanded */}
+            {isSidebarExpanded && (
+              <div className="flex-1 overflow-y-auto">
+                {/* Business Details Section */}
+                <div className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Package className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Business Details</span>
@@ -397,73 +437,9 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Single Top Bar with Back, Tabs, and Stage */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <div className="border-b bg-background px-4 h-14 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => router.back()}
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <div className="h-6 w-px bg-border mx-1" />
-                <TabsList className="h-14 bg-transparent p-0 gap-1">
-                  <TabsTrigger 
-                    value="overview" 
-                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
-                  >
-                    Overview
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="checklist"
-                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
-                  >
-                    Checklist
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="notes"
-                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
-                  >
-                    Notes
-                    {sellerNotes.length > 0 && (
-                      <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-normal">
-                        {sellerNotes.length}
-                      </span>
-                    )}
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="files"
-                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
-                  >
-                    Files
-                    {sellerFiles.length > 0 && (
-                      <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-normal">
-                        {sellerFiles.length}
-                      </span>
-                    )}
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-              <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
-                <SelectTrigger className="w-40 h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {acquisitionStages.map((stage) => (
-                    <SelectItem key={stage.id} value={stage.id}>
-                      {stage.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <TabsContent value="overview" className="mt-0 h-full">
+          {/* Tab Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <TabsContent value="overview" className="mt-0 h-full">
                 <div className="grid gap-6 lg:grid-cols-2">
                   {/* Contacts - Full width */}
                   <div className="lg:col-span-2">
@@ -701,7 +677,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </Card>
               </TabsContent>
             </div>
-          </Tabs>
+          </div>
         </div>
 
         {/* Incomplete Checklist Dialog */}
@@ -711,7 +687,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           incompleteItems={incompleteItems}
           onConfirm={handleConfirmIncompleteMove}
         />
-      </div>
+      </Tabs>
     </TooltipProvider>
   )
 }
