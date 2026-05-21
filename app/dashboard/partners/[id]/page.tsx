@@ -18,12 +18,10 @@ import {
   Building2,
   MapPin,
   Globe,
-  Link as LinkIcon,
   Package,
   Tag,
   FileCheck,
   Calendar,
-  Lock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -292,23 +290,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </div>
                 
                 <div className="space-y-3">
-                  {seller.websiteUrl && (
-                    <div className="flex items-start gap-3">
-                      <LinkIcon className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Website</p>
-                        <a 
-                          href={seller.websiteUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-blue-600 hover:underline"
-                        >
-                          {seller.websiteUrl.replace(/^https?:\/\//, '')}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  
                   <div className="flex items-start gap-3">
                     <Tag className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                     <div>
@@ -334,6 +315,30 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       </p>
                     </div>
                   </div>
+
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
+                    <Select defaultValue={seller.gmvPotential || undefined}>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue placeholder="Select GMV potential" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="very-high">Very High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {seller.priorityScore !== null && (
+                    <div className="flex items-start gap-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
+                        <p className="text-sm font-medium">{seller.priorityScore.toFixed(1)} / 5.0</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -458,15 +463,28 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     />
                   </div>
 
-                  {/* Legal Identity */}
+                  {/* Supplier Details */}
                   <Card>
                     <CardHeader className="pb-3">
                       <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-base">Legal Identity</CardTitle>
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-base">Supplier Details</CardTitle>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                      {seller.websiteUrl && (
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Website</p>
+                          <a 
+                            href={seller.websiteUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium text-blue-600 hover:underline"
+                          >
+                            {seller.websiteUrl.replace(/^https?:\/\//, '')}
+                          </a>
+                        </div>
+                      )}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
@@ -489,35 +507,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                         <p className="text-xs text-muted-foreground mb-1">Registered Address</p>
                         <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Business Assessment */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-base">Business Assessment</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
-                        <Select defaultValue={seller.gmvPotential || undefined}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select GMV potential" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="very-high">Very High</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {seller.priorityScore !== null && (
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
-                          <p className="text-sm font-medium">{seller.priorityScore.toFixed(1)} / 5.0</p>
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
 
