@@ -446,7 +446,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           <div className="flex-1 overflow-y-auto p-6">
             <TabsContent value="overview" className="mt-0 h-full">
                 <div className="grid gap-6 lg:grid-cols-2">
-                  {/* Contacts - Full width */}
+                  {/* Contact Details - Full width */}
                   <div className="lg:col-span-2">
                     <ContactManagement
                       companyName={seller.companyName}
@@ -455,6 +455,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       vatNumber={seller.vatNumber}
                       registeredAddress={seller.registeredAddress}
                       createdAt={seller.createdAt}
+                      websiteUrl={seller.websiteUrl}
                       primaryContact={primaryContact}
                       additionalContacts={additionalContacts}
                       onPrimaryContactChange={setPrimaryContact}
@@ -472,19 +473,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {seller.websiteUrl && (
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Website</p>
-                          <a 
-                            href={seller.websiteUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-sm font-medium text-blue-600 hover:underline"
-                          >
-                            {seller.websiteUrl.replace(/^https?:\/\//, '')}
-                          </a>
-                        </div>
-                      )}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
