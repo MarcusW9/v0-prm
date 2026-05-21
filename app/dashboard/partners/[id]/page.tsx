@@ -678,9 +678,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       )}
                     </div>
                   </SortableContext>
-                </DndContext>}
-                </div>
-              </TabsContent>
+                </DndContext>
+            </TabsContent>
 
               <TabsContent value="checklist" className="mt-0 h-full">
                 <Card>
