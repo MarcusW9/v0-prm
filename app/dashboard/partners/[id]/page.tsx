@@ -395,68 +395,66 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Single Top Bar with Back, Tabs, and Stage */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <div className="border-b bg-background px-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="border-b bg-background px-4 h-14 flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => router.back()}
-                  className="h-8 w-8"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <TabsList className="h-12 w-auto bg-transparent p-0 gap-6">
+                <div className="h-6 w-px bg-border mx-1" />
+                <TabsList className="h-14 bg-transparent p-0 gap-1">
                   <TabsTrigger 
                     value="overview" 
-                    className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger 
                     value="checklist"
-                    className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
                   >
                     Checklist
                   </TabsTrigger>
                   <TabsTrigger 
                     value="notes"
-                    className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
                   >
                     Notes
                     {sellerNotes.length > 0 && (
-                      <span className="ml-2 text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">
+                      <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-normal">
                         {sellerNotes.length}
                       </span>
                     )}
                   </TabsTrigger>
                   <TabsTrigger 
                     value="files"
-                    className="h-12 px-0 pb-3 pt-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
                   >
                     Files
                     {sellerFiles.length > 0 && (
-                      <span className="ml-2 text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">
+                      <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full font-normal">
                         {sellerFiles.length}
                       </span>
                     )}
                   </TabsTrigger>
                 </TabsList>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground">Stage:</span>
-                <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
-                  <SelectTrigger className="w-44">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {acquisitionStages.map((stage) => (
-                      <SelectItem key={stage.id} value={stage.id}>
-                        {stage.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
+                <SelectTrigger className="w-40 h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {acquisitionStages.map((stage) => (
+                    <SelectItem key={stage.id} value={stage.id}>
+                      {stage.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Tab Content */}
