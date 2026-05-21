@@ -362,12 +362,28 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
             isSidebarExpanded ? "w-72" : "w-16"
           )}>
             {/* Supplier Details - Only when expanded */}
-            {isSidebarExpanded && (
+            {isSidebarExpanded ? (
               <div className="flex-1 overflow-y-auto">
                 {/* Company Name Header */}
                 <div className="p-4 border-b">
-                  <h2 className="font-semibold text-base">{seller.companyName}</h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">Added {formatDate(seller.createdAt)}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h2 className="font-semibold text-base">{seller.companyName}</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Added {formatDate(seller.createdAt)}</p>
+                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => setIsSidebarExpanded(false)}
+                          className="p-1.5 rounded-md text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors flex-shrink-0"
+                          aria-label="Collapse sidebar"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Collapse sidebar</TooltipContent>
+                    </Tooltip>
+                  </div>
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                     <Badge
                       variant="outline"
@@ -568,31 +584,23 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Collapse/Expand Toggle */}
-          <div className="border-t p-2 mt-auto">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                >
-                  {isSidebarExpanded ? (
-                    <>
-                      <ChevronLeft className="h-4 w-4" />
-                      <span>Collapse</span>
-                    </>
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                </button>
-              </TooltipTrigger>
-              {!isSidebarExpanded && (
+          ) : (
+            /* Collapsed State - Show expand icon */
+            <div className="flex flex-col items-center py-4">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setIsSidebarExpanded(true)}
+                    className="p-2 rounded-md text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+                    aria-label="Expand sidebar"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </TooltipTrigger>
                 <TooltipContent side="right">Expand sidebar</TooltipContent>
-              )}
-            </Tooltip>
-          </div>
+              </Tooltip>
+            </div>
+          )}
         </div>
 
         {/* Main Content Area */}
