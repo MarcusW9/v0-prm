@@ -358,11 +358,11 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
         <div className="flex flex-1 overflow-hidden">
           {/* Left Sidebar - Supplier Details */}
           <div className={cn(
-            "flex flex-col border-r bg-slate-100 transition-all duration-300",
+            "flex flex-col border-r bg-slate-100 transition-all duration-300 h-full",
             isSidebarExpanded ? "w-72" : "w-16"
           )}>
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto min-h-0">
               {/* Supplier Details - Only when expanded */}
               {isSidebarExpanded && (
                 <>
