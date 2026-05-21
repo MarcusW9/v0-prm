@@ -484,16 +484,87 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
               {/* Quick Stats */}
               <div className="p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Activity</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white rounded-lg p-3 border">
-                    <p className="text-2xl font-semibold">{sellerNotes.length}</p>
-                    <p className="text-xs text-muted-foreground">Notes</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Activity</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{sellerNotes.length} notes</span>
+                    <span>•</span>
+                    <span>{sellerFiles.length} files</span>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border">
-                    <p className="text-2xl font-semibold">{sellerFiles.length}</p>
-                    <p className="text-xs text-muted-foreground">Files</p>
+                </div>
+                
+                {/* Notes Preview */}
+                <div className="space-y-3">
+                  {/* Add Note Input */}
+                  <div className="bg-white rounded-lg border">
+                    <Textarea
+                      placeholder="Add a note..."
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                      className="min-h-[60px] border-0 resize-none text-sm focus-visible:ring-0 focus-visible:ring-offset-0"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey && newNote.trim()) {
+                          e.preventDefault()
+                          // Add note logic here
+                          setNewNote('')
+                        }
+                      }}
+                    />
+                    {newNote.trim() && (
+                      <div className="px-3 pb-2 flex justify-end">
+                        <Button 
+                          size="sm" 
+                          className="h-7 text-xs"
+                          onClick={() => {
+                            // Add note logic here
+                            setNewNote('')
+                          }}
+                        >
+                          Add Note
+                        </Button>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Recent Notes */}
+                  {sellerNotes.length > 0 ? (
+                    <div className="space-y-2">
+                      {sellerNotes
+                        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                        .slice(0, 3)
+                        .map((note) => (
+                          <div key={note.id} className="bg-white rounded-lg p-3 border">
+                            <div className="flex items-start gap-2">
+                              <Avatar className="h-6 w-6 flex-shrink-0">
+                                <AvatarFallback className="bg-muted text-[10px]">
+                                  {note.authorInitials}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-muted-foreground mb-0.5">
+                                  {note.author} • {formatDate(note.createdAt)}
+                                </p>
+                                <p className="text-sm text-foreground line-clamp-2">
+                                  {note.content}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      {sellerNotes.length > 3 && (
+                        <button
+                          onClick={() => setActiveTab('notes')}
+                          className="w-full text-xs text-blue-600 hover:text-blue-700 py-1"
+                        >
+                          View all {sellerNotes.length} notes
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center py-2">
+                      No notes yet
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
