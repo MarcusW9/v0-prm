@@ -4,6 +4,7 @@ import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { mockSellers, mockNotes, mockFiles, acquisitionManagers, onboardingManagers, accountManagers } from '@/lib/data/mock-sellers'
 import { getStageDefinition, acquisitionStages } from '@/lib/data/pipeline-stages'
+import { pipelines } from '@/lib/data/pipeline-stages'
 import { getPriorityColor } from '@/lib/data/pipeline-stages'
 import { getChecklistForStage } from '@/lib/data/stage-checklists'
 import {
@@ -366,7 +367,13 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 <div className="p-4 border-b">
                   <h2 className="font-semibold text-base">{seller.companyName}</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">Added {formatDate(seller.createdAt)}</p>
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-slate-300 text-slate-600"
+                    >
+                      {pipelines.find(p => p.id === seller.pipeline)?.label.replace(' Pipeline', '') || seller.pipeline}
+                    </Badge>
                     {stageDefinition && (
                       <Badge
                         variant="secondary"
