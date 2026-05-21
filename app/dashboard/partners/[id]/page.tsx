@@ -126,6 +126,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   // Drag and drop for overview sections
   const [sectionOrder, setSectionOrder] = useState([
     'supplier-details',
+    'business-metrics',
     'contact-details', 
     'assignment',
     'compliance-checks',
@@ -531,7 +532,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                         switch (sectionId) {
                           case 'supplier-details':
                             return (
-                              <SortableCard key={sectionId} id={sectionId} isFullWidth>
+                              <SortableCard key={sectionId} id={sectionId}>
                                 <Card>
                                   <CardHeader className="pb-3">
                                     <div className="flex items-center gap-2">
@@ -539,59 +540,65 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                                       <CardTitle className="text-base">Supplier Details</CardTitle>
                                     </div>
                                   </CardHeader>
-                                  <CardContent>
-                                    <div className="grid gap-6 lg:grid-cols-2">
-                                      {/* Left Column - Legal Identity */}
-                                      <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                          <div>
-                                            <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
-                                            <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
-                                          </div>
-                                          <div>
-                                            <p className="text-xs text-muted-foreground mb-1">VAT Number</p>
-                                            <p className="text-sm font-medium">{seller.vatNumber || '—'}</p>
-                                          </div>
-                                        </div>
-                                        <div>
-                                          <p className="text-xs text-muted-foreground mb-1">Registered Address</p>
-                                          <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
-                                        </div>
+                                  <CardContent className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
+                                        <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
                                       </div>
-
-                                      {/* Right Column - Business Details */}
-                                      <div className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                          <div>
-                                            <p className="text-xs text-muted-foreground mb-1">Expected Products</p>
-                                            <p className="text-sm font-medium">
-                                              {seller.numberOfProductsExpected !== null 
-                                                ? seller.numberOfProductsExpected.toLocaleString()
-                                                : '—'}
-                                            </p>
-                                          </div>
-                                          <div>
-                                            <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
-                                            <p className="text-sm font-medium">
-                                              {seller.priorityScore !== null ? `${seller.priorityScore.toFixed(1)} / 5.0` : '—'}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        <div>
-                                          <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
-                                          <Select defaultValue={seller.gmvPotential || undefined}>
-                                            <SelectTrigger className="w-full">
-                                              <SelectValue placeholder="Select GMV potential" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              <SelectItem value="low">Low</SelectItem>
-                                              <SelectItem value="medium">Medium</SelectItem>
-                                              <SelectItem value="high">High</SelectItem>
-                                              <SelectItem value="very-high">Very High</SelectItem>
-                                            </SelectContent>
-                                          </Select>
-                                        </div>
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">VAT Number</p>
+                                        <p className="text-sm font-medium">{seller.vatNumber || '—'}</p>
                                       </div>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Registered Address</p>
+                                      <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </SortableCard>
+                            )
+                          case 'business-metrics':
+                            return (
+                              <SortableCard key={sectionId} id={sectionId}>
+                                <Card>
+                                  <CardHeader className="pb-3">
+                                    <div className="flex items-center gap-2">
+                                      <FileCheck className="h-4 w-4 text-muted-foreground" />
+                                      <CardTitle className="text-base">Business Metrics</CardTitle>
+                                    </div>
+                                  </CardHeader>
+                                  <CardContent className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Expected Products</p>
+                                        <p className="text-sm font-medium">
+                                          {seller.numberOfProductsExpected !== null 
+                                            ? seller.numberOfProductsExpected.toLocaleString()
+                                            : '—'}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Priority Score</p>
+                                        <p className="text-sm font-medium">
+                                          {seller.priorityScore !== null ? `${seller.priorityScore.toFixed(1)} / 5.0` : '—'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">GMV Potential</p>
+                                      <Select defaultValue={seller.gmvPotential || undefined}>
+                                        <SelectTrigger className="w-full">
+                                          <SelectValue placeholder="Select GMV potential" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="low">Low</SelectItem>
+                                          <SelectItem value="medium">Medium</SelectItem>
+                                          <SelectItem value="high">High</SelectItem>
+                                          <SelectItem value="very-high">Very High</SelectItem>
+                                        </SelectContent>
+                                      </Select>
                                     </div>
                                   </CardContent>
                                 </Card>
