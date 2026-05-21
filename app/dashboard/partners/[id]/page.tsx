@@ -42,6 +42,12 @@ import {
   GripVertical,
   Copy,
   Check,
+  History,
+  GitCommit,
+  MessageSquare,
+  Paperclip,
+  Settings,
+  ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -337,6 +343,12 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     {sellerFiles.length}
                   </span>
                 )}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="timeline"
+                className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
+              >
+                Timeline
               </TabsTrigger>
             </TabsList>
           </div>
@@ -858,6 +870,232 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="timeline" className="mt-0 h-full overflow-y-auto">
+                <div className="p-6">
+                  {(() => {
+                    // Generate timeline events from various sources
+                    type TimelineEvent = {
+                      id: string
+                      date: Date
+                      type: 'stage_change' | 'note_added' | 'file_added' | 'checklist_updated' | 'detail_changed' | 'created'
+                      title: string
+                      description: string
+                      user?: string
+                    }
+
+                    const timelineEvents: TimelineEvent[] = [
+                      // Seller created
+                      {
+                        id: 'created',
+                        date: new Date(seller.createdAt),
+                        type: 'created',
+                        title: 'Seller Added',
+                        description: `${seller.companyName} was added to the system`,
+                        user: 'System',
+                      },
+                      // Notes
+                      ...sellerNotes.map((note) => ({
+                        id: `note-${note.id}`,
+                        date: new Date(note.createdAt),
+                        type: 'note_added' as const,
+                        title: 'Note Added',
+                        description: note.content.length > 100 ? note.content.substring(0, 100) + '...' : note.content,
+                        user: note.author,
+                      })),
+                      // Files
+                      ...sellerFiles.map((file) => ({
+                        id: `file-${file.id}`,
+                        date: new Date(file.uploadedAt),
+                        type: 'file_added' as const,
+                        title: 'File Uploaded',
+                        description: file.fileName,
+                        user: file.uploadedBy,
+                      })),
+                      // Mock stage changes
+                      {
+                        id: 'stage-1',
+                        date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                        type: 'stage_change',
+                        title: 'Stage Changed',
+                        description: 'Moved from Identified to Contacted',
+                        user: 'Sarah Johnson',
+                      },
+                      {
+                        id: 'stage-2',
+                        date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+                        type: 'stage_change',
+                        title: 'Stage Changed',
+                        description: 'Moved from Contacted to Qualified',
+                        user: 'Sarah Johnson',
+                      },
+                      // Mock checklist updates
+                      {
+                        id: 'checklist-1',
+                        date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+                        type: 'checklist_updated',
+                        title: 'Checklist Updated',
+                        description: 'Completed "Initial contact made"',
+                        user: 'Sarah Johnson',
+                      },
+                      {
+                        id: 'checklist-2',
+                        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+                        type: 'checklist_updated',
+                        title: 'Checklist Updated',
+                        description: 'Completed "Company verification"',
+                        user: 'Michael Chen',
+                      },
+                      // Mock detail changes
+                      {
+                        id: 'detail-1',
+                        date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+                        type: 'detail_changed',
+                        title: 'Details Updated',
+                        description: 'GMV Potential changed from "Medium" to "High"',
+                        user: 'Sarah Johnson',
+                      },
+                    ]
+
+                    // Sort by date descending
+                    const sortedEvents = timelineEvents.sort((a, b) => b.date.getTime() - a.date.getTime())
+
+                    // Group by month/year
+                    const groupedEvents = sortedEvents.reduce((groups, event) => {
+                      const monthYear = event.date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+                      if (!groups[monthYear]) {
+                        groups[monthYear] = []
+                      }
+                      groups[monthYear].push(event)
+                      return groups
+                    }, {} as Record<string, TimelineEvent[]>)
+
+                    const getEventIcon = (type: TimelineEvent['type']) => {
+                      switch (type) {
+                        case 'stage_change':
+                          return <ArrowRight className="h-3.5 w-3.5" />
+                        case 'note_added':
+                          return <MessageSquare className="h-3.5 w-3.5" />
+                        case 'file_added':
+                          return <Paperclip className="h-3.5 w-3.5" />
+                        case 'checklist_updated':
+                          return <CheckCircle2 className="h-3.5 w-3.5" />
+                        case 'detail_changed':
+                          return <Settings className="h-3.5 w-3.5" />
+                        case 'created':
+                          return <GitCommit className="h-3.5 w-3.5" />
+                        default:
+                          return <History className="h-3.5 w-3.5" />
+                      }
+                    }
+
+                    const getEventColor = (type: TimelineEvent['type']) => {
+                      switch (type) {
+                        case 'stage_change':
+                          return 'bg-blue-500'
+                        case 'note_added':
+                          return 'bg-amber-500'
+                        case 'file_added':
+                          return 'bg-purple-500'
+                        case 'checklist_updated':
+                          return 'bg-emerald-500'
+                        case 'detail_changed':
+                          return 'bg-slate-500'
+                        case 'created':
+                          return 'bg-teal-500'
+                        default:
+                          return 'bg-slate-400'
+                      }
+                    }
+
+                    const getEventLabel = (type: TimelineEvent['type']) => {
+                      switch (type) {
+                        case 'stage_change':
+                          return 'STAGE CHANGED'
+                        case 'note_added':
+                          return 'NOTE ADDED'
+                        case 'file_added':
+                          return 'FILE UPLOADED'
+                        case 'checklist_updated':
+                          return 'CHECKLIST UPDATED'
+                        case 'detail_changed':
+                          return 'DETAILS CHANGED'
+                        case 'created':
+                          return 'SELLER CREATED'
+                        default:
+                          return 'UPDATE'
+                      }
+                    }
+
+                    const getEventLabelColor = (type: TimelineEvent['type']) => {
+                      switch (type) {
+                        case 'stage_change':
+                          return 'text-blue-600'
+                        case 'note_added':
+                          return 'text-amber-600'
+                        case 'file_added':
+                          return 'text-purple-600'
+                        case 'checklist_updated':
+                          return 'text-emerald-600'
+                        case 'detail_changed':
+                          return 'text-slate-600'
+                        case 'created':
+                          return 'text-teal-600'
+                        default:
+                          return 'text-slate-500'
+                      }
+                    }
+
+                    return (
+                      <div className="space-y-8">
+                        {Object.entries(groupedEvents).map(([monthYear, events]) => (
+                          <div key={monthYear}>
+                            <h3 className="text-sm font-semibold text-foreground mb-4">{monthYear}</h3>
+                            <div className="space-y-0">
+                              {events.map((event, index) => (
+                                <div key={event.id} className="flex gap-4">
+                                  {/* Date column */}
+                                  <div className="w-16 flex-shrink-0 text-right">
+                                    <span className="text-sm text-muted-foreground">
+                                      {event.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                    </span>
+                                  </div>
+
+                                  {/* Timeline line and dot */}
+                                  <div className="flex flex-col items-center">
+                                    <div className={cn(
+                                      "w-3 h-3 rounded-full flex items-center justify-center text-white flex-shrink-0",
+                                      getEventColor(event.type)
+                                    )}>
+                                    </div>
+                                    {index < events.length - 1 && (
+                                      <div className="w-px h-full min-h-[60px] bg-border" />
+                                    )}
+                                  </div>
+
+                                  {/* Content */}
+                                  <div className="flex-1 pb-6">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className={cn("text-xs font-medium uppercase tracking-wide", getEventLabelColor(event.type))}>
+                                        {getEventLabel(event.type)}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-foreground">{event.description}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {event.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                                      {event.user && ` • ${event.user}`}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })()}
+                </div>
               </TabsContent>
             </div>
           </div>
