@@ -22,7 +22,6 @@ import {
   Package,
   Tag,
   FileCheck,
-  Globe,
   Calendar,
   Lock
 } from 'lucide-react'
