@@ -961,39 +961,34 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     // Sort by date descending
                     const sortedEvents = timelineEvents.sort((a, b) => b.date.getTime() - a.date.getTime())
 
-                    // Group by month/year
-                    const groupedEvents = sortedEvents.reduce((groups, event) => {
-                      const monthYear = event.date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
-                      if (!groups[monthYear]) {
-                        groups[monthYear] = []
-                      }
-                      groups[monthYear].push(event)
-                      return groups
-                    }, {} as Record<string, TimelineEvent[]>)
+                    // Group events by stage sections (stage changes become section headers)
+                    type StageSection = {
+                      stageEvent: TimelineEvent | null
+                      events: TimelineEvent[]
+                    }
 
-                    const getEventIcon = (type: TimelineEvent['type']) => {
-                      switch (type) {
-                        case 'stage_change':
-                          return <ArrowRight className="h-3.5 w-3.5" />
-                        case 'note_added':
-                          return <MessageSquare className="h-3.5 w-3.5" />
-                        case 'file_added':
-                          return <Paperclip className="h-3.5 w-3.5" />
-                        case 'checklist_updated':
-                          return <CheckCircle2 className="h-3.5 w-3.5" />
-                        case 'detail_changed':
-                          return <Settings className="h-3.5 w-3.5" />
-                        case 'created':
-                          return <GitCommit className="h-3.5 w-3.5" />
-                        default:
-                          return <History className="h-3.5 w-3.5" />
+                    const stageSections: StageSection[] = []
+                    let currentSection: StageSection = { stageEvent: null, events: [] }
+
+                    sortedEvents.forEach((event) => {
+                      if (event.type === 'stage_change') {
+                        // Save current section if it has events
+                        if (currentSection.events.length > 0 || currentSection.stageEvent) {
+                          stageSections.push(currentSection)
+                        }
+                        // Start new section with this stage change as header
+                        currentSection = { stageEvent: event, events: [] }
+                      } else {
+                        currentSection.events.push(event)
                       }
+                    })
+                    // Push the last section
+                    if (currentSection.events.length > 0 || currentSection.stageEvent) {
+                      stageSections.push(currentSection)
                     }
 
                     const getEventColor = (type: TimelineEvent['type']) => {
                       switch (type) {
-                        case 'stage_change':
-                          return 'bg-blue-500'
                         case 'note_added':
                           return 'bg-amber-500'
                         case 'file_added':
@@ -1011,8 +1006,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
                     const getEventLabel = (type: TimelineEvent['type']) => {
                       switch (type) {
-                        case 'stage_change':
-                          return 'STAGE CHANGED'
                         case 'note_added':
                           return 'NOTE ADDED'
                         case 'file_added':
@@ -1030,8 +1023,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
 
                     const getEventLabelColor = (type: TimelineEvent['type']) => {
                       switch (type) {
-                        case 'stage_change':
-                          return 'text-blue-600'
                         case 'note_added':
                           return 'text-amber-600'
                         case 'file_added':
@@ -1048,48 +1039,62 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     }
 
                     return (
-                      <div className="space-y-8">
-                        {Object.entries(groupedEvents).map(([monthYear, events]) => (
-                          <div key={monthYear}>
-                            <h3 className="text-sm font-semibold text-foreground mb-4">{monthYear}</h3>
-                            <div className="space-y-0">
-                              {events.map((event, index) => (
-                                <div key={event.id} className="flex gap-4">
-                                  {/* Date column */}
-                                  <div className="w-16 flex-shrink-0 text-right">
-                                    <span className="text-sm text-muted-foreground">
-                                      {event.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                                    </span>
-                                  </div>
-
-                                  {/* Timeline line and dot */}
-                                  <div className="flex flex-col items-center">
-                                    <div className={cn(
-                                      "w-3 h-3 rounded-full flex items-center justify-center text-white flex-shrink-0",
-                                      getEventColor(event.type)
-                                    )}>
-                                    </div>
-                                    {index < events.length - 1 && (
-                                      <div className="w-px h-full min-h-[60px] bg-border" />
-                                    )}
-                                  </div>
-
-                                  {/* Content */}
-                                  <div className="flex-1 pb-6">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <span className={cn("text-xs font-medium uppercase tracking-wide", getEventLabelColor(event.type))}>
-                                        {getEventLabel(event.type)}
-                                      </span>
-                                    </div>
-                                    <p className="text-sm text-foreground">{event.description}</p>
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      {event.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                                      {event.user && ` • ${event.user}`}
-                                    </p>
-                                  </div>
+                      <div className="space-y-6">
+                        {stageSections.map((section, sectionIndex) => (
+                          <div key={section.stageEvent?.id || `section-${sectionIndex}`}>
+                            {/* Stage Change Header */}
+                            {section.stageEvent && (
+                              <div className="flex items-center gap-3 mb-4 pb-3 border-b">
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100">
+                                  <ArrowRight className="h-4 w-4 text-blue-600" />
                                 </div>
-                              ))}
-                            </div>
+                                <div className="flex-1">
+                                  <h3 className="text-sm font-semibold text-foreground">
+                                    {section.stageEvent.description}
+                                  </h3>
+                                  <p className="text-xs text-muted-foreground">
+                                    {section.stageEvent.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    {' at '}
+                                    {section.stageEvent.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                                    {section.stageEvent.user && ` • ${section.stageEvent.user}`}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Events within this stage */}
+                            {section.events.length > 0 && (
+                              <div className="ml-4 pl-4 border-l-2 border-slate-200 space-y-0">
+                                {section.events.map((event, index) => (
+                                  <div key={event.id} className="flex gap-4 relative">
+                                    {/* Timeline dot */}
+                                    <div className="absolute -left-[21px] top-1">
+                                      <div className={cn(
+                                        "w-2.5 h-2.5 rounded-full",
+                                        getEventColor(event.type)
+                                      )} />
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="flex-1 pb-4">
+                                      <div className="flex items-center gap-2 mb-0.5">
+                                        <span className={cn("text-xs font-medium uppercase tracking-wide", getEventLabelColor(event.type))}>
+                                          {getEventLabel(event.type)}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {event.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm text-foreground">{event.description}</p>
+                                      <p className="text-xs text-muted-foreground mt-0.5">
+                                        {event.date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                                        {event.user && ` • ${event.user}`}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
