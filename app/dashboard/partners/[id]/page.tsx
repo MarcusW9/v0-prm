@@ -103,7 +103,7 @@ function SortableCard({ id, children, isFullWidth = false }: SortableCardProps) 
         <button
           {...attributes}
           {...listeners}
-          className="absolute left-2 top-3 z-10 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-slate-100 cursor-grab active:cursor-grabbing transition-opacity"
+          className="absolute right-2 top-3 z-10 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-slate-100 cursor-grab active:cursor-grabbing transition-opacity"
           aria-label="Drag to reorder"
         >
           <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -482,7 +482,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'supplier-details':
                             return (
                               <SortableCard key={sectionId} id={sectionId} isFullWidth>
-                                <Card className="pl-8">
+                                <Card>
                                   <CardHeader className="pb-3">
                                     <div className="flex items-center gap-2">
                                       <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -550,7 +550,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'contact-details':
                             return (
                               <SortableCard key={sectionId} id={sectionId} isFullWidth>
-                                <div className="pl-8">
+                                <div className="">
                                   <ContactManagement
                                     companyName={seller.companyName}
                                     crn={seller.crn}
@@ -571,7 +571,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'assignment':
                             return (
                               <SortableCard key={sectionId} id={sectionId}>
-                                <Card className="pl-8">
+                                <Card>
                                   <CardHeader className="pb-3">
                                     <div className="flex items-center gap-2">
                                       <Users className="h-4 w-4 text-muted-foreground" />
@@ -631,7 +631,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'compliance-checks':
                             return (
                               <SortableCard key={sectionId} id={sectionId}>
-                                <Card className="pl-8">
+                                <Card>
                                   <CardHeader className="pb-3">
                                     <CardTitle className="text-base">Compliance Checks</CardTitle>
                                   </CardHeader>
