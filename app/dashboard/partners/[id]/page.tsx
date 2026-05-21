@@ -39,6 +39,8 @@ import {
   Calendar,
   Users,
   GripVertical,
+  Copy,
+  Check,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -145,6 +147,15 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
         return arrayMove(items, oldIndex, newIndex)
       })
     }
+  }
+  
+  // Copy to clipboard
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  
+  const copyToClipboard = async (text: string, field: string) => {
+    await navigator.clipboard.writeText(text)
+    setCopiedField(field)
+    setTimeout(() => setCopiedField(null), 2000)
   }
   
   // Find seller
@@ -395,19 +406,58 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Primary Contact</p>
                       <p className="text-sm font-medium">{seller.primaryContact.name}</p>
-                      <p className="text-xs text-muted-foreground">{seller.primaryContact.email}</p>
+                      <div className="flex items-center gap-1.5 group/email">
+                        <p className="text-xs text-muted-foreground">{seller.primaryContact.email}</p>
+                        <button
+                          onClick={() => copyToClipboard(seller.primaryContact.email, 'email')}
+                          className="opacity-0 group-hover/email:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
+                          aria-label="Copy email"
+                        >
+                          {copiedField === 'email' ? (
+                            <Check className="h-3 w-3 text-emerald-500" />
+                          ) : (
+                            <Copy className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                     
                     {seller.primaryContact.phone && (
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Phone</p>
-                        <p className="text-sm font-medium">{seller.primaryContact.phone}</p>
+                        <div className="flex items-center gap-1.5 group/phone">
+                          <p className="text-sm font-medium">{seller.primaryContact.phone}</p>
+                          <button
+                            onClick={() => copyToClipboard(seller.primaryContact.phone!, 'phone')}
+                            className="opacity-0 group-hover/phone:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
+                            aria-label="Copy phone"
+                          >
+                            {copiedField === 'phone' ? (
+                              <Check className="h-3 w-3 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-3 w-3 text-muted-foreground" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     )}
 
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
-                      <p className="text-sm font-medium">{seller.crn}</p>
+                      <div className="flex items-center gap-1.5 group/crn">
+                        <p className="text-sm font-medium">{seller.crn}</p>
+                        <button
+                          onClick={() => copyToClipboard(seller.crn, 'crn')}
+                          className="opacity-0 group-hover/crn:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
+                          aria-label="Copy CRN"
+                        >
+                          {copiedField === 'crn' ? (
+                            <Check className="h-3 w-3 text-emerald-500" />
+                          ) : (
+                            <Copy className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div>
