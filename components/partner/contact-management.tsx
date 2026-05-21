@@ -327,21 +327,6 @@ export function ContactManagement({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Website URL */}
-        {websiteUrl && (
-          <div>
-            <p className="text-xs text-muted-foreground mb-1">Website</p>
-            <a 
-              href={websiteUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-blue-600 hover:underline"
-            >
-              {websiteUrl.replace(/^https?:\/\//, '')}
-            </a>
-          </div>
-        )}
-
         {/* Legal Identity Section - Read Only */}
         {showLegalIdentity && (
         <div className="space-y-4">
