@@ -265,7 +265,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 {/* Company Name Header */}
                 <div className="p-4 border-b">
                   <h2 className="font-semibold text-base">{seller.companyName}</h2>
-                  <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-muted-foreground mt-0.5">Added {formatDate(seller.createdAt)}</p>
+                  <div className="flex items-center gap-2 mt-2">
                     {stageDefinition && (
                       <Badge
                         variant="secondary"
@@ -403,10 +404,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                               <div>
                                 <p className="text-xs text-muted-foreground mb-1">VAT Number</p>
                                 <p className="text-sm font-medium">{seller.vatNumber || '—'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">Added to System</p>
-                                <p className="text-sm font-medium">{formatDate(seller.createdAt)}</p>
                               </div>
                             </div>
                             <div>
