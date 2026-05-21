@@ -99,9 +99,9 @@ function SortableCard({ id, children, isFullWidth = false }: SortableCardProps) 
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(isFullWidth ? 'lg:col-span-2' : '')}
+      className={cn(isFullWidth ? 'lg:col-span-2' : 'min-w-0')}
     >
-      <div className="relative group">
+      <div className="relative group h-full">
         <button
           {...attributes}
           {...listeners}
@@ -533,7 +533,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'supplier-details':
                             return (
                               <SortableCard key={sectionId} id={sectionId}>
-                                <Card>
+                                <Card className="h-full">
                                   <CardHeader className="pb-3">
                                     <div className="flex items-center gap-2">
                                       <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -562,7 +562,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'business-metrics':
                             return (
                               <SortableCard key={sectionId} id={sectionId}>
-                                <Card>
+                                <Card className="h-full">
                                   <CardHeader className="pb-3">
                                     <div className="flex items-center gap-2">
                                       <FileCheck className="h-4 w-4 text-muted-foreground" />
@@ -628,7 +628,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'assignment':
                             return (
                               <SortableCard key={sectionId} id={sectionId}>
-                                <Card>
+                                <Card className="h-full">
                                   <CardHeader className="pb-3">
                                     <div className="flex items-center gap-2">
                                       <Users className="h-4 w-4 text-muted-foreground" />
@@ -688,7 +688,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           case 'compliance-checks':
                             return (
                               <SortableCard key={sectionId} id={sectionId}>
-                                <Card>
+                                <Card className="h-full">
                                   <CardHeader className="pb-3">
                                     <CardTitle className="text-base">Compliance Checks</CardTitle>
                                   </CardHeader>
