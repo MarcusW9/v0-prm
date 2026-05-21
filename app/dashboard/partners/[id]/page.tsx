@@ -283,6 +283,45 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
             {/* Supplier Details - Only when expanded */}
             {isSidebarExpanded && (
               <div className="flex-1 overflow-y-auto">
+                {/* Contact Details Section */}
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Contact Details</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {seller.websiteUrl && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Website</p>
+                        <a 
+                          href={seller.websiteUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-blue-600 hover:underline break-all"
+                        >
+                          {seller.websiteUrl.replace(/^https?:\/\//, '')}
+                        </a>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Primary Contact</p>
+                      <p className="text-sm font-medium">{seller.primaryContact.name}</p>
+                      <p className="text-xs text-muted-foreground">{seller.primaryContact.email}</p>
+                    </div>
+                    
+                    {seller.primaryContact.phone && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Phone</p>
+                        <p className="text-sm font-medium">{seller.primaryContact.phone}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
                 {/* Business Details Section */}
                 <div className="p-4">
                 <div className="flex items-center gap-2 mb-3">
