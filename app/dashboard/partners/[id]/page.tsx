@@ -244,60 +244,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           {/* Supplier Details - Only when expanded */}
           {isSidebarExpanded && (
             <div className="flex-1 overflow-y-auto">
-              {/* Legal Identity Section */}
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Legal Identity</span>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Company Reg. Number</p>
-                      <p className="text-sm font-medium">{seller.crn}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <Globe className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Country of Registration</p>
-                      <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
-                    </div>
-                  </div>
-                  
-                  {seller.vatNumber && (
-                    <div className="flex items-start gap-3">
-                      <FileCheck className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">VAT Number</p>
-                        <p className="text-sm font-medium">{seller.vatNumber}</p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Registered Address</p>
-                      <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Added to System</p>
-                      <p className="text-sm font-medium">{formatDate(seller.createdAt)}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
               {/* Business Details Section */}
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-3">
@@ -346,6 +292,60 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           ? seller.numberOfProductsExpected.toLocaleString()
                           : '—'}
                       </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Legal Identity Section */}
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Legal Identity</span>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Company Reg. Number</p>
+                      <p className="text-sm font-medium">{seller.crn}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Globe className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Country of Registration</p>
+                      <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
+                    </div>
+                  </div>
+                  
+                  {seller.vatNumber && (
+                    <div className="flex items-start gap-3">
+                      <FileCheck className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">VAT Number</p>
+                        <p className="text-sm font-medium">{seller.vatNumber}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Registered Address</p>
+                      <p className="text-sm font-medium">{formatAddress(seller.registeredAddress)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Calendar className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Added to System</p>
+                      <p className="text-sm font-medium">{formatDate(seller.createdAt)}</p>
                     </div>
                   </div>
                 </div>
