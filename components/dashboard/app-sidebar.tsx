@@ -27,6 +27,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarFooter,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -63,6 +64,8 @@ const pipelineViews = [
 export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { state: sidebarState } = useSidebar()
+  const isCollapsed = sidebarState === 'collapsed'
   const [pipelineOpen, setPipelineOpen] = useState(pathname.startsWith('/dashboard/pipeline'))
 
   const isActive = (href: string) => {
@@ -76,6 +79,15 @@ export function AppSidebar() {
 
   const handlePipelineNavigation = (view: string) => {
     router.push(`/dashboard/pipeline?view=${view}`)
+  }
+
+  // When collapsed, clicking Pipeline icon navigates to default (Acquisition)
+  const handlePipelineClick = () => {
+    if (isCollapsed) {
+      router.push('/dashboard/pipeline?view=acquisition')
+    } else {
+      setPipelineOpen(!pipelineOpen)
+    }
   }
 
   return (
@@ -144,10 +156,11 @@ export function AppSidebar() {
               ))}
               
               {/* Pipeline with expandable sub-menu */}
-              <Collapsible open={pipelineOpen} onOpenChange={setPipelineOpen}>
+              <Collapsible open={pipelineOpen && !isCollapsed} onOpenChange={setPipelineOpen}>
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
+                      onClick={handlePipelineClick}
                       className={cn(
                         'text-slate-300 hover:bg-slate-700 hover:text-white w-full',
                         isPipelineActive && 'bg-slate-700 text-white'
@@ -155,10 +168,12 @@ export function AppSidebar() {
                     >
                       <Columns3 className="h-4 w-4" />
                       <span className="flex-1">Pipeline</span>
-                      <ChevronDown className={cn(
-                        "h-4 w-4 transition-transform duration-200",
-                        pipelineOpen && "rotate-180"
-                      )} />
+                      {!isCollapsed && (
+                        <ChevronDown className={cn(
+                          "h-4 w-4 transition-transform duration-200",
+                          pipelineOpen && "rotate-180"
+                        )} />
+                      )}
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
