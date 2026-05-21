@@ -17,6 +17,10 @@ import {
   ChevronRight,
   Building2,
   MapPin,
+  Globe,
+  Link as LinkIcon,
+  Package,
+  Tag,
   FileCheck,
   Globe,
   Calendar,
@@ -288,6 +292,61 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     <div>
                       <p className="text-xs text-muted-foreground">Added to System</p>
                       <p className="text-sm font-medium">{formatDate(seller.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Business Details Section */}
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Package className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Business Details</span>
+                </div>
+                
+                <div className="space-y-3">
+                  {seller.websiteUrl && (
+                    <div className="flex items-start gap-3">
+                      <LinkIcon className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">Website</p>
+                        <a 
+                          href={seller.websiteUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-blue-600 hover:underline"
+                        >
+                          {seller.websiteUrl.replace(/^https?:\/\//, '')}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-start gap-3">
+                    <Tag className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Product Categories</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {seller.primaryProductCategories.map((cat) => (
+                          <span key={cat} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <Package className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Expected Products</p>
+                      <p className="text-sm font-medium">
+                        {seller.numberOfProductsExpected !== null 
+                          ? seller.numberOfProductsExpected.toLocaleString()
+                          : '—'}
+                      </p>
                     </div>
                   </div>
                 </div>

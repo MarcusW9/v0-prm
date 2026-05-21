@@ -74,6 +74,10 @@ export interface Seller {
   countryOfRegistration: string
   vatNumber: string | null
   registeredAddress: RegisteredAddress
+  // Business Details
+  websiteUrl: string | null
+  primaryProductCategories: string[] // e.g. ['toys', 'games']
+  numberOfProductsExpected: number | null
   // Primary contact (mandatory)
   primaryContact: Contact
   // Additional contacts (optional array)

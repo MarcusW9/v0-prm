@@ -14,6 +14,9 @@ export const mockSellers: Seller[] = [
       postcode: 'M1 4BT',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://kopadot.co.uk',
+    primaryProductCategories: ['Home', 'Decor'],
+    numberOfProductsExpected: 150,
     primaryContact: {
       id: 'c1-1',
       name: 'Jessica Alderson',
@@ -55,6 +58,9 @@ export const mockSellers: Seller[] = [
       postcode: 'B1 2AA',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://wallplus.co.uk',
+    primaryProductCategories: ['Home', 'Wall Art', 'Decor'],
+    numberOfProductsExpected: 320,
     primaryContact: {
       id: 'c2-1',
       name: 'Keith Teh',
@@ -102,6 +108,9 @@ export const mockSellers: Seller[] = [
       postcode: 'LS1 5PQ',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://homediscount.co.uk',
+    primaryProductCategories: ['Home', 'Furniture', 'Storage'],
+    numberOfProductsExpected: 580,
     primaryContact: {
       id: 'c3-1',
       name: 'Raj Handa',
@@ -156,6 +165,9 @@ export const mockSellers: Seller[] = [
       postcode: 'S1 2AB',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://themia.co.uk',
+    primaryProductCategories: ['Furniture', 'Living Room'],
+    numberOfProductsExpected: 200,
     primaryContact: {
       id: 'c4-1',
       name: 'Ahmet Ozgul',
@@ -196,6 +208,9 @@ export const mockSellers: Seller[] = [
       postcode: 'BS1 6YZ',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://selectip.co.uk',
+    primaryProductCategories: ['Electronics', 'Accessories'],
+    numberOfProductsExpected: 450,
     primaryContact: {
       id: 'c5-1',
       name: 'Sarah Walker',
@@ -244,6 +259,9 @@ export const mockSellers: Seller[] = [
       postcode: 'NE1 4AA',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://trimetals.co.uk',
+    primaryProductCategories: ['Garden', 'Storage', 'Outdoor'],
+    numberOfProductsExpected: 85,
     primaryContact: {
       id: 'c6-1',
       name: 'Tim Smith',
@@ -283,6 +301,9 @@ export const mockSellers: Seller[] = [
       postcode: 'EC1A 1BB',
       country: 'United Kingdom',
     },
+    websiteUrl: null,
+    primaryProductCategories: ['Other'],
+    numberOfProductsExpected: null,
     primaryContact: {
       id: 'c7-1',
       name: 'Contact Person',
@@ -323,6 +344,9 @@ export const mockSellers: Seller[] = [
       postcode: 'L1 0AA',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://artemishome.co.uk',
+    primaryProductCategories: ['Home', 'Furniture', 'Decor'],
+    numberOfProductsExpected: 280,
     primaryContact: {
       id: 'c8-1',
       name: 'Luke Mildren',
@@ -377,6 +401,9 @@ export const mockSellers: Seller[] = [
       postcode: 'EH1 1YZ',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://comfydeluxe.co.uk',
+    primaryProductCategories: ['Furniture', 'Bedroom', 'Living Room'],
+    numberOfProductsExpected: 350,
     primaryContact: {
       id: 'c9-1',
       name: 'Nasar Ali',
@@ -416,6 +443,9 @@ export const mockSellers: Seller[] = [
       postcode: 'CF1 1AA',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://ledvance.co.uk',
+    primaryProductCategories: ['Lighting', 'Electronics'],
+    numberOfProductsExpected: 620,
     primaryContact: {
       id: 'c10-1',
       name: 'Peter Alexander',
@@ -463,6 +493,9 @@ export const mockSellers: Seller[] = [
       postcode: 'G1 2PP',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://muchv.co.uk',
+    primaryProductCategories: ['Toys', 'Games', 'Kids'],
+    numberOfProductsExpected: 180,
     primaryContact: {
       id: 'c11-1',
       name: 'Pauline Mucha',
@@ -502,6 +535,9 @@ export const mockSellers: Seller[] = [
       postcode: 'BT1 3QQ',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://qretail.co.uk',
+    primaryProductCategories: ['Home', 'Kitchen', 'Bathroom'],
+    numberOfProductsExpected: 420,
     primaryContact: {
       id: 'c12-1',
       name: 'SAMEER SHARMA',
@@ -541,6 +577,9 @@ export const mockSellers: Seller[] = [
       postcode: 'NG1 5FF',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://snugcity.co.uk',
+    primaryProductCategories: ['Furniture', 'Sofas', 'Living Room'],
+    numberOfProductsExpected: 95,
     primaryContact: {
       id: 'c13-1',
       name: 'Aqeel Ahmed',
@@ -588,6 +627,9 @@ export const mockSellers: Seller[] = [
       postcode: 'OX1 2AB',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://zebedee.co.uk',
+    primaryProductCategories: ['Home', 'Textiles', 'Decor'],
+    numberOfProductsExpected: 240,
     primaryContact: {
       id: 'c14-1',
       name: 'Diane Challender',
@@ -628,6 +670,9 @@ export const mockSellers: Seller[] = [
       postcode: 'CB1 9HH',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://gardentrading.co.uk',
+    primaryProductCategories: ['Garden', 'Outdoor', 'Furniture'],
+    numberOfProductsExpected: 750,
     primaryContact: {
       id: 'c15-1',
       name: 'Emma Richards',
@@ -682,6 +727,9 @@ export const mockSellers: Seller[] = [
       postcode: 'SO1 0AA',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://modernfurniture.co.uk',
+    primaryProductCategories: ['Furniture', 'Modern', 'Office'],
+    numberOfProductsExpected: 380,
     primaryContact: {
       id: 'c16-1',
       name: 'James Cooper',
@@ -729,6 +777,9 @@ export const mockSellers: Seller[] = [
       postcode: 'BN1 1GG',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://outdoorliving.co.uk',
+    primaryProductCategories: ['Garden', 'Outdoor', 'BBQ'],
+    numberOfProductsExpected: 290,
     primaryContact: {
       id: 'c17-1',
       name: 'Sophie Martin',
@@ -768,6 +819,9 @@ export const mockSellers: Seller[] = [
       postcode: 'RG1 7KK',
       country: 'United Kingdom',
     },
+    websiteUrl: 'https://kitchenwarehouse.co.uk',
+    primaryProductCategories: ['Kitchen', 'Appliances', 'Cookware'],
+    numberOfProductsExpected: 520,
     primaryContact: {
       id: 'c18-1',
       name: 'David Brown',
