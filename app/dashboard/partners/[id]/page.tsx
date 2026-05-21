@@ -22,6 +22,7 @@ import {
   Tag,
   FileCheck,
   Calendar,
+  Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -342,62 +343,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </div>
               </div>
 
-              <Separator />
-
-              {/* Assignment Section */}
-              <div className="p-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Assignment</p>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
-                    <Select defaultValue={seller.acquisitionManager || undefined}>
-                      <SelectTrigger className="w-full h-8 text-sm">
-                        <SelectValue placeholder="Not assigned" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {acquisitionManagers.map((manager) => (
-                          <SelectItem key={manager} value={manager}>
-                            {manager}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
-                    <Select defaultValue={seller.onboardingManager || undefined}>
-                      <SelectTrigger className="w-full h-8 text-sm">
-                        <SelectValue placeholder="Not assigned" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {onboardingManagers.map((manager) => (
-                          <SelectItem key={manager} value={manager}>
-                            {manager}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
-                    <Select defaultValue={seller.accountManager || undefined}>
-                      <SelectTrigger className="w-full h-8 text-sm">
-                        <SelectValue placeholder="Not assigned" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {accountManagers.map((manager) => (
-                          <SelectItem key={manager} value={manager}>
-                            {manager}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
               {/* Quick Stats */}
               <div className="p-4">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Activity</p>
@@ -446,24 +391,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           <div className="flex-1 overflow-y-auto p-6">
             <TabsContent value="overview" className="mt-0 h-full">
                 <div className="grid gap-6 lg:grid-cols-2">
-                  {/* Contact Details - Full width */}
-                  <div className="lg:col-span-2">
-                    <ContactManagement
-                      companyName={seller.companyName}
-                      crn={seller.crn}
-                      countryOfRegistration={seller.countryOfRegistration}
-                      vatNumber={seller.vatNumber}
-                      registeredAddress={seller.registeredAddress}
-                      createdAt={seller.createdAt}
-                      websiteUrl={seller.websiteUrl}
-                      primaryContact={primaryContact}
-                      additionalContacts={additionalContacts}
-                      onPrimaryContactChange={setPrimaryContact}
-                      onAdditionalContactsChange={setAdditionalContacts}
-                      showLegalIdentity={false}
-                    />
-                  </div>
-
                   {/* Supplier Details */}
                   <Card>
                     <CardHeader className="pb-3">
@@ -497,6 +424,81 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Assignment */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-base">Assignment</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Acquisition Manager</p>
+                        <Select defaultValue={seller.acquisitionManager || undefined}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Not assigned" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {acquisitionManagers.map((manager) => (
+                              <SelectItem key={manager} value={manager}>
+                                {manager}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Onboarding Manager</p>
+                        <Select defaultValue={seller.onboardingManager || undefined}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Not assigned" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {onboardingManagers.map((manager) => (
+                              <SelectItem key={manager} value={manager}>
+                                {manager}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Account Manager</p>
+                        <Select defaultValue={seller.accountManager || undefined}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Not assigned" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {accountManagers.map((manager) => (
+                              <SelectItem key={manager} value={manager}>
+                                {manager}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Contact Details - Full width */}
+                  <div className="lg:col-span-2">
+                    <ContactManagement
+                      companyName={seller.companyName}
+                      crn={seller.crn}
+                      countryOfRegistration={seller.countryOfRegistration}
+                      vatNumber={seller.vatNumber}
+                      registeredAddress={seller.registeredAddress}
+                      createdAt={seller.createdAt}
+                      websiteUrl={seller.websiteUrl}
+                      primaryContact={primaryContact}
+                      additionalContacts={additionalContacts}
+                      onPrimaryContactChange={setPrimaryContact}
+                      onAdditionalContactsChange={setAdditionalContacts}
+                      showLegalIdentity={false}
+                    />
+                  </div>
 
                   {/* Compliance Checks */}
                   <Card>
