@@ -42,6 +42,9 @@ import {
   GripVertical,
   Copy,
   Check,
+  AlertCircle,
+  Clock,
+  Ban,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -338,6 +341,12 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     {sellerFiles.length}
                   </span>
                 )}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="management"
+                className="h-14 px-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-muted-foreground data-[state=active]:text-foreground"
+              >
+                Management
               </TabsTrigger>
             </TabsList>
           </div>
@@ -938,6 +947,204 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="management" className="mt-0 h-full overflow-y-auto">
+                <div className="space-y-6 p-1">
+                  {/* Seller Information Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        Seller Information
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Update editable seller details not covered in the Overview section.
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Trading Name</label>
+                          <input
+                            type="text"
+                            defaultValue={seller.companyName}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Business Email</label>
+                          <input
+                            type="email"
+                            defaultValue={seller.primaryContact.email}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Business Phone</label>
+                          <input
+                            type="tel"
+                            defaultValue={seller.primaryContact.phone || ''}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Website URL</label>
+                          <input
+                            type="url"
+                            defaultValue={seller.websiteUrl || ''}
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end pt-2">
+                        <Button 
+                          onClick={() => toast.success('Seller information updated')}
+                        >
+                          Save Changes
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Divider */}
+                  <Separator />
+
+                  {/* Lifecycle Status Section */}
+                  <Card className="border-amber-200 bg-amber-50/30">
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2 text-amber-800">
+                        <AlertCircle className="h-4 w-4" />
+                        Seller Lifecycle Status
+                      </CardTitle>
+                      <p className="text-sm text-amber-700">
+                        Manage the seller&apos;s lifecycle status. These actions require confirmation and cannot be easily undone.
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Current Status Display */}
+                      <div className="rounded-lg border border-amber-200 bg-white p-4">
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Current Status</p>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Active
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Status Change Options */}
+                      <div className="space-y-4">
+                        <p className="text-sm font-medium text-amber-800">Change Status To:</p>
+                        
+                        {/* Delayed Option */}
+                        <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-4">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-full bg-amber-100">
+                              <Clock className="h-4 w-4 text-amber-600" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium">Mark as Delayed</h4>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Temporarily pause the seller&apos;s onboarding process. The seller can be reactivated later.
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3 pl-11">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Reason <span className="text-red-500">*</span></label>
+                              <Select>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a reason" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="awaiting-documents">Awaiting documents from seller</SelectItem>
+                                  <SelectItem value="compliance-review">Pending compliance review</SelectItem>
+                                  <SelectItem value="seller-request">Requested by seller</SelectItem>
+                                  <SelectItem value="internal-review">Internal review required</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Supporting Notes <span className="text-red-500">*</span></label>
+                              <Textarea 
+                                placeholder="Provide details about why this seller is being delayed..."
+                                className="min-h-[80px]"
+                              />
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                              onClick={() => toast.info('Confirmation required before changing status')}
+                            >
+                              <Clock className="h-4 w-4 mr-2" />
+                              Mark as Delayed
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Terminated Option */}
+                        <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-4">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 rounded-full bg-red-100">
+                              <Ban className="h-4 w-4 text-red-600" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium">Mark as Terminated</h4>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Permanently end the seller relationship. This action should only be used when the partnership cannot continue.
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3 pl-11">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Reason <span className="text-red-500">*</span></label>
+                              <Select>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a reason" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="compliance-failure">Failed compliance requirements</SelectItem>
+                                  <SelectItem value="seller-withdrew">Seller withdrew application</SelectItem>
+                                  <SelectItem value="business-closed">Business closed</SelectItem>
+                                  <SelectItem value="duplicate">Duplicate entry</SelectItem>
+                                  <SelectItem value="fraud">Suspected fraud</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Supporting Notes <span className="text-red-500">*</span></label>
+                              <Textarea 
+                                placeholder="Provide details about why this seller is being terminated..."
+                                className="min-h-[80px]"
+                              />
+                            </div>
+                            <Button 
+                              variant="outline" 
+                              className="border-red-300 text-red-700 hover:bg-red-50"
+                              onClick={() => toast.info('Confirmation required before changing status')}
+                            >
+                              <Ban className="h-4 w-4 mr-2" />
+                              Mark as Terminated
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Warning Notice */}
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 text-slate-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-slate-600">
+                          Seller deletion is not permitted. If you need to remove a seller record, please contact your system administrator.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
             </div>
           </div>
