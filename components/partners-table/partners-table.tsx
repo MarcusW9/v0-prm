@@ -3,8 +3,8 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, Plus, ExternalLink, Download, X, ChevronDown, Check, Filter } from 'lucide-react'
-import type { Seller, PipelineStage, PriorityLevel, SellerCategory, IntegrationMethod, Agency } from '@/lib/types/seller'
-import { getStageDefinition, getPriorityColor, acquisitionStages, onboardingStages, accountManagementStages } from '@/lib/data/pipeline-stages'
+import type { Seller, PipelineStage, PriorityLevel, SellerCategory, IntegrationMethod, Agency, PipelineType } from '@/lib/types/seller'
+import { getStageDefinition, getPriorityColor, acquisitionStages, onboardingStages, accountManagementStages, pipelines } from '@/lib/data/pipeline-stages'
 import { 
   acquisitionManagers, 
   onboardingManagers, 
@@ -66,6 +66,7 @@ const filterColors: Record<string, { bg: string; text: string; border: string }>
   integration: { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
   agency: { bg: 'bg-purple-100', text: 'text-purple-700', border: 'border-purple-200' },
   manager: { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200' },
+  pipeline: { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-200' },
   stage: { bg: 'bg-rose-100', text: 'text-rose-700', border: 'border-rose-200' },
   priority: { bg: 'bg-cyan-100', text: 'text-cyan-700', border: 'border-cyan-200' },
 }
@@ -154,6 +155,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
   const [selectedIntegrations, setSelectedIntegrations] = useState<IntegrationMethod[]>([])
   const [selectedAgencies, setSelectedAgencies] = useState<Agency[]>([])
   const [selectedManagers, setSelectedManagers] = useState<string[]>([])
+  const [selectedPipelines, setSelectedPipelines] = useState<PipelineType[]>([])
   const [selectedStages, setSelectedStages] = useState<PipelineStage[]>([])
   const [selectedPriorities, setSelectedPriorities] = useState<PriorityLevel[]>([])
 
@@ -172,6 +174,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     setSelectedIntegrations([])
     setSelectedAgencies([])
     setSelectedManagers([])
+    setSelectedPipelines([])
     setSelectedStages([])
     setSelectedPriorities([])
     setSearchQuery('')
@@ -220,6 +223,11 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
           if (!hasMatchingManager) return false
         }
 
+        // Pipeline filter
+        if (selectedPipelines.length > 0 && !selectedPipelines.includes(seller.pipeline)) {
+          return false
+        }
+
         // Stage filter
         if (selectedStages.length > 0 && !selectedStages.includes(seller.stage)) {
           return false
@@ -256,6 +264,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedIntegrations,
     selectedAgencies,
     selectedManagers,
+    selectedPipelines,
     selectedStages,
     selectedPriorities,
     sortBy,
@@ -327,6 +336,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedIntegrations.length > 0 ||
     selectedAgencies.length > 0 ||
     selectedManagers.length > 0 ||
+    selectedPipelines.length > 0 ||
     selectedStages.length > 0 ||
     selectedPriorities.length > 0 ||
     searchQuery.length > 0
@@ -336,6 +346,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedIntegrations.length +
     selectedAgencies.length +
     selectedManagers.length +
+    selectedPipelines.length +
     selectedStages.length +
     selectedPriorities.length
 
@@ -359,6 +370,11 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
       label: m,
       type: 'manager' as const,
       onRemove: () => toggleFilter(m, selectedManagers, setSelectedManagers),
+    })),
+    ...selectedPipelines.map((p) => ({
+      label: pipelines.find((pl) => pl.id === p)?.label || p,
+      type: 'pipeline' as const,
+      onRemove: () => toggleFilter(p, selectedPipelines, setSelectedPipelines),
     })),
     ...selectedStages.map((s) => ({
       label: allStages.find((st) => st.id === s)?.label || s,
@@ -478,6 +494,14 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
               selected={selectedManagers}
               onToggle={(v) => toggleFilter(v, selectedManagers, setSelectedManagers)}
               colorKey="manager"
+            />
+
+            <FilterDropdown
+              label="Pipeline"
+              options={pipelines.map((p) => ({ value: p.id, label: p.label })) as { value: PipelineType; label: string }[]}
+              selected={selectedPipelines}
+              onToggle={(v) => toggleFilter(v, selectedPipelines, setSelectedPipelines)}
+              colorKey="pipeline"
             />
 
             <FilterDropdown
