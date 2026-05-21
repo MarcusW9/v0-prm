@@ -570,13 +570,13 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
             </div>
           )}
 
-          {/* Collapse/Expand Toggle - Fixed at bottom */}
-          <div className="border-t p-2 bg-slate-100 flex-shrink-0">
+          {/* Collapse/Expand Toggle - Fixed at bottom of sidebar */}
+          <div className="mt-auto border-t p-2 bg-slate-100 flex-shrink-0">
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors"
                 >
                   {isSidebarExpanded ? (
                     <>
