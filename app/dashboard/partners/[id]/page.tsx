@@ -1054,7 +1054,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0 flex-1 flex flex-col">
-                <Card className="flex-1 flex flex-col">
+                <Card className="flex-1 flex flex-col min-h-[calc(100vh-180px)]">
                   <CardContent className="pt-6 flex-1 flex flex-col">
                     {/* Add New Note */}
                     <div className="space-y-3 mb-6">
@@ -1106,7 +1106,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsContent>
 
               <TabsContent value="files" className="mt-0 flex-1 flex flex-col">
-                <Card className="flex-1 flex flex-col">
+                <Card className="flex-1 flex flex-col min-h-[calc(100vh-180px)]">
                   <CardContent className="pt-6 flex-1 flex flex-col">
                     {/* Upload Area */}
                     <div
