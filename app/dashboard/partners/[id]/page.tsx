@@ -93,6 +93,20 @@ interface SortableCardProps {
   isFullWidth?: boolean
 }
 
+// Helper to get human-readable reason labels
+const reasonLabels: Record<string, string> = {
+  'awaiting-documents': 'Awaiting documents from seller',
+  'compliance-review': 'Pending compliance review',
+  'seller-request': 'Requested by seller',
+  'internal-review': 'Internal review required',
+  'compliance-failure': 'Failed compliance requirements',
+  'seller-withdrew': 'Seller withdrew application',
+  'business-closed': 'Business closed',
+  'duplicate': 'Duplicate entry',
+  'fraud': 'Suspected fraud',
+  'other': 'Other',
+}
+
 function SortableCard({ id, children, isFullWidth = false }: SortableCardProps) {
   const {
     attributes,
@@ -139,6 +153,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   
   // Seller lifecycle status state
   const [sellerStatus, setSellerStatus] = useState<'active' | 'delayed' | 'terminated'>('active')
+  const [statusReason, setStatusReason] = useState('')
+  const [statusNotes, setStatusNotes] = useState('')
   const [delayedReason, setDelayedReason] = useState('')
   const [delayedNotes, setDelayedNotes] = useState('')
   const [terminateReason, setTerminateReason] = useState('')
@@ -453,6 +469,52 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 {/* Contact Info */}
                 <div className="p-4">
                   <div className="space-y-3">
+                    {/* Status Info Bubble - shown when delayed or terminated */}
+                    {sellerStatus !== 'active' && statusReason && (
+                      <div className={cn(
+                        "rounded-lg p-3 border",
+                        sellerStatus === 'delayed' 
+                          ? "bg-amber-50 border-amber-200" 
+                          : "bg-red-50 border-red-200"
+                      )}>
+                        <div className="flex items-center gap-2 mb-2">
+                          {sellerStatus === 'delayed' ? (
+                            <Clock className="h-4 w-4 text-amber-600" />
+                          ) : (
+                            <Ban className="h-4 w-4 text-red-600" />
+                          )}
+                          <span className={cn(
+                            "text-sm font-semibold",
+                            sellerStatus === 'delayed' ? "text-amber-700" : "text-red-700"
+                          )}>
+                            {sellerStatus === 'delayed' ? 'Delayed' : 'Terminated'}
+                          </span>
+                        </div>
+                        <div className="space-y-1.5">
+                          <div>
+                            <p className="text-xs text-muted-foreground">Reason</p>
+                            <p className={cn(
+                              "text-xs font-medium",
+                              sellerStatus === 'delayed' ? "text-amber-800" : "text-red-800"
+                            )}>
+                              {reasonLabels[statusReason] || statusReason}
+                            </p>
+                          </div>
+                          {statusNotes && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Supporting Notes</p>
+                              <p className={cn(
+                                "text-xs",
+                                sellerStatus === 'delayed' ? "text-amber-800" : "text-red-800"
+                              )}>
+                                {statusNotes}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {seller.websiteUrl && (
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Website</p>
@@ -1128,6 +1190,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                               disabled={!delayedReason || !delayedNotes.trim()}
                               onClick={() => {
                                 setSellerStatus('delayed')
+                                setStatusReason(delayedReason)
+                                setStatusNotes(delayedNotes)
                                 toast.success('Seller marked as delayed')
                                 setDelayedReason('')
                                 setDelayedNotes('')
@@ -1255,6 +1319,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 disabled={terminateConfirmText.toLowerCase() !== 'terminate'}
                 onClick={() => {
                   setSellerStatus('terminated')
+                  setStatusReason(terminateReason)
+                  setStatusNotes(terminateNotes)
                   toast.success('Seller has been terminated')
                   setShowTerminateDialog(false)
                   setTerminateConfirmText('')
