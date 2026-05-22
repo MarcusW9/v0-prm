@@ -164,6 +164,11 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const [showTerminateDialog, setShowTerminateDialog] = useState(false)
   const [terminateConfirmText, setTerminateConfirmText] = useState('')
   
+  // Reactivation confirmation dialog state (when changing stage while delayed)
+  const [showReactivateDialog, setShowReactivateDialog] = useState(false)
+  const [pendingReactivateStage, setPendingReactivateStage] = useState<AcquisitionStage | null>(null)
+  const [shouldReactivateAfterIncomplete, setShouldReactivateAfterIncomplete] = useState(false)
+  
   // Drag and drop for overview sections
   const [sectionOrder, setSectionOrder] = useState([
     'supplier-details',
@@ -291,6 +296,13 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   }
 
   const handleStageChange = (newStage: AcquisitionStage) => {
+    // If seller is delayed, show reactivation confirmation first
+    if (sellerStatus === 'delayed') {
+      setPendingReactivateStage(newStage)
+      setShowReactivateDialog(true)
+      return
+    }
+    
     // Check if current stage has incomplete items
     const currentChecklist = getChecklistForStage(currentStage)
     if (currentChecklist) {
@@ -307,15 +319,45 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
     completeStageChange(newStage)
   }
 
-  const completeStageChange = (newStage: AcquisitionStage) => {
+  const completeStageChange = (newStage: AcquisitionStage, reactivate: boolean = false) => {
     setCurrentStage(newStage)
-    toast.success(`Moved to ${getStageDefinition(newStage)?.label || newStage}`)
+    if (reactivate) {
+      setSellerStatus('active')
+      setStatusReason('')
+      setStatusNotes('')
+      toast.success(`Seller reactivated and moved to ${getStageDefinition(newStage)?.label || newStage}`)
+    } else {
+      toast.success(`Moved to ${getStageDefinition(newStage)?.label || newStage}`)
+    }
+  }
+
+  const handleConfirmReactivateMove = () => {
+    if (pendingReactivateStage) {
+      // Check for incomplete items before completing
+      const currentChecklist = getChecklistForStage(currentStage)
+      if (currentChecklist) {
+        const missing = hasIncompleteItems(currentChecklist, checklistProgress)
+        if (missing.length > 0) {
+          setIncompleteItems(missing)
+          setPendingStageChange(pendingReactivateStage)
+          setShouldReactivateAfterIncomplete(true)
+          setShowReactivateDialog(false)
+          setShowIncompleteDialog(true)
+          setPendingReactivateStage(null)
+          return
+        }
+      }
+      completeStageChange(pendingReactivateStage, true)
+      setPendingReactivateStage(null)
+    }
+    setShowReactivateDialog(false)
   }
 
   const handleConfirmIncompleteMove = () => {
     if (pendingStageChange) {
-      completeStageChange(pendingStageChange)
+      completeStageChange(pendingStageChange, shouldReactivateAfterIncomplete)
       setPendingStageChange(null)
+      setShouldReactivateAfterIncomplete(false)
     }
     setShowIncompleteDialog(false)
   }
@@ -1277,6 +1319,44 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           incompleteItems={incompleteItems}
           onConfirm={handleConfirmIncompleteMove}
         />
+
+        {/* Reactivation Confirmation Dialog */}
+        <Dialog open={showReactivateDialog} onOpenChange={setShowReactivateDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-emerald-700 flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5" />
+                Confirm Reactivation
+              </DialogTitle>
+              <DialogDescription>
+                Changing the stage will reactivate this seller and change their status from <span className="font-semibold text-amber-600">Delayed</span> back to <span className="font-semibold text-emerald-600">Active</span>.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-muted-foreground">
+                The seller will be moved to the selected stage and returned to active status in the pipeline.
+              </p>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowReactivateDialog(false)
+                  setPendingReactivateStage(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-emerald-600 hover:bg-emerald-700"
+                onClick={handleConfirmReactivateMove}
+              >
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Reactivate & Change Stage
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Terminate Confirmation Dialog */}
         <Dialog open={showTerminateDialog} onOpenChange={(open) => {
