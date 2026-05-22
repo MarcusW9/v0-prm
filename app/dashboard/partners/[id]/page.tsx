@@ -137,6 +137,13 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true)
   const [newNote, setNewNote] = useState('')
   
+  // Seller lifecycle status state
+  const [sellerStatus, setSellerStatus] = useState<'active' | 'delayed' | 'terminated'>('active')
+  const [delayedReason, setDelayedReason] = useState('')
+  const [delayedNotes, setDelayedNotes] = useState('')
+  const [terminateReason, setTerminateReason] = useState('')
+  const [terminateNotes, setTerminateNotes] = useState('')
+  
   // Terminate confirmation dialog state
   const [showTerminateDialog, setShowTerminateDialog] = useState(false)
   const [terminateConfirmText, setTerminateConfirmText] = useState('')
