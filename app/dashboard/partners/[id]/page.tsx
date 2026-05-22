@@ -466,7 +466,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           )}
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
           {/* Left Sidebar - Supplier Details */}
           <div className={cn(
             "flex flex-col border-r bg-slate-100 transition-all duration-300 overflow-hidden",
@@ -786,10 +786,10 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <TabsContent value="overview" className="mt-0 h-full">
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+              <TabsContent value="overview" className="mt-0 flex-1">
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -1034,7 +1034,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </DndContext>
             </TabsContent>
 
-              <TabsContent value="checklist" className="mt-0 h-full">
+              <TabsContent value="checklist" className="mt-0 flex-1">
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base">Pipeline Progress</CardTitle>
@@ -1053,8 +1053,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="notes" className="mt-0 h-full">
-                <Card className="h-full flex flex-col">
+              <TabsContent value="notes" className="mt-0 flex-1 flex flex-col">
+                <Card className="flex-1 flex flex-col">
                   <CardContent className="pt-6 flex-1 flex flex-col">
                     {/* Add New Note */}
                     <div className="space-y-3 mb-6">
@@ -1105,8 +1105,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="files" className="mt-0 h-full">
-                <Card className="h-full flex flex-col">
+              <TabsContent value="files" className="mt-0 flex-1 flex flex-col">
+                <Card className="flex-1 flex flex-col">
                   <CardContent className="pt-6 flex-1 flex flex-col">
                     {/* Upload Area */}
                     <div
@@ -1149,7 +1149,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="management" className="mt-0 h-full overflow-y-auto">
+              <TabsContent value="management" className="mt-0 flex-1 overflow-y-auto">
                 <div className="space-y-6 p-1">
                   {/* Seller Information Section */}
                   <Card>
