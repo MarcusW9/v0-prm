@@ -783,13 +783,13 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </Tooltip>
             </div>
           )}
-        </div>
+          </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-6">
-            <TabsContent value="overview" className="mt-0 h-full">
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <TabsContent value="overview" className="mt-0 h-full">
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
