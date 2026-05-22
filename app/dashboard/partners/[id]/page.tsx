@@ -1054,8 +1054,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0 h-full">
-                <Card>
-                  <CardContent className="pt-6">
+                <Card className="h-full">
+                  <CardContent className="pt-6 h-full">
                     {/* Add New Note */}
                     <div className="space-y-3 mb-6">
                       <Textarea
@@ -1106,8 +1106,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsContent>
 
               <TabsContent value="files" className="mt-0 h-full">
-                <Card>
-                  <CardContent className="pt-6">
+                <Card className="h-full">
+                  <CardContent className="pt-6 h-full">
                     {/* Upload Area */}
                     <div
                       className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted p-8 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors mb-6"
