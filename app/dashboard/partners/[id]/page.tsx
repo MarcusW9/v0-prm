@@ -199,6 +199,20 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   // Copy to clipboard
   const [copiedField, setCopiedField] = useState<string | null>(null)
   
+  // Mirakl fields state - auto-fill with test data based on seller id
+  const [miraklName, setMiraklName] = useState('')
+  const [miraklId, setMiraklId] = useState('')
+  
+  // Initialize Mirakl fields with test data
+  useEffect(() => {
+    if (id) {
+      // Generate test data - pad ID to 4 digits
+      const paddedId = id.toString().padStart(4, '0')
+      setMiraklId(`ID:${paddedId}`)
+      // For test data, use a variation of company name or leave empty
+    }
+  }, [id])
+  
   const copyToClipboard = async (text: string, field: string) => {
     await navigator.clipboard.writeText(text)
     setCopiedField(field)
@@ -610,32 +624,57 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       </div>
                     )}
 
+                    {/* Mirakl Name */}
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
-                      <div className="flex items-center gap-1.5 group/crn">
-                        <p className="text-sm font-medium">{seller.crn}</p>
-                        <button
-                          onClick={() => copyToClipboard(seller.crn, 'crn')}
-                          className="opacity-0 group-hover/crn:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
-                          aria-label="Copy CRN"
-                        >
-                          {copiedField === 'crn' ? (
-                            <Check className="h-3 w-3 text-emerald-500" />
-                          ) : (
-                            <Copy className="h-3 w-3 text-muted-foreground" />
-                          )}
-                        </button>
+                      <p className="text-xs text-muted-foreground mb-1">Mirakl Name</p>
+                      <div className="flex items-center gap-1.5 group/miraklname">
+                        <input
+                          type="text"
+                          value={miraklName}
+                          onChange={(e) => setMiraklName(e.target.value)}
+                          placeholder="Enter Mirakl name..."
+                          className="flex-1 text-sm font-medium bg-transparent border-b border-transparent hover:border-slate-300 focus:border-primary focus:outline-none py-0.5 min-w-0"
+                        />
+                        {miraklName && (
+                          <button
+                            onClick={() => copyToClipboard(miraklName, 'miraklname')}
+                            className="opacity-0 group-hover/miraklname:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity flex-shrink-0"
+                            aria-label="Copy Mirakl Name"
+                          >
+                            {copiedField === 'miraklname' ? (
+                              <Check className="h-3 w-3 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-3 w-3 text-muted-foreground" />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
 
+                    {/* Mirakl ID */}
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">Product Categories</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {seller.primaryProductCategories.map((cat) => (
-                          <span key={cat} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                            {cat}
-                          </span>
-                        ))}
+                      <p className="text-xs text-muted-foreground mb-1">Mirakl ID</p>
+                      <div className="flex items-center gap-1.5 group/miraklid">
+                        <input
+                          type="text"
+                          value={miraklId}
+                          onChange={(e) => setMiraklId(e.target.value)}
+                          placeholder="ID:0000"
+                          className="flex-1 text-sm font-medium bg-transparent border-b border-transparent hover:border-slate-300 focus:border-primary focus:outline-none py-0.5 min-w-0"
+                        />
+                        {miraklId && (
+                          <button
+                            onClick={() => copyToClipboard(miraklId, 'miraklid')}
+                            className="opacity-0 group-hover/miraklid:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity flex-shrink-0"
+                            aria-label="Copy Mirakl ID"
+                          >
+                            {copiedField === 'miraklid' ? (
+                              <Check className="h-3 w-3 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-3 w-3 text-muted-foreground" />
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -773,6 +812,23 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                                   <CardContent className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                       <div>
+                                        <p className="text-xs text-muted-foreground mb-1">Company Reg. Number</p>
+                                        <div className="flex items-center gap-1.5 group/crn">
+                                          <p className="text-sm font-medium">{seller.crn}</p>
+                                          <button
+                                            onClick={() => copyToClipboard(seller.crn, 'crn')}
+                                            className="opacity-0 group-hover/crn:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-opacity"
+                                            aria-label="Copy CRN"
+                                          >
+                                            {copiedField === 'crn' ? (
+                                              <Check className="h-3 w-3 text-emerald-500" />
+                                            ) : (
+                                              <Copy className="h-3 w-3 text-muted-foreground" />
+                                            )}
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <div>
                                         <p className="text-xs text-muted-foreground mb-1">Country of Registration</p>
                                         <p className="text-sm font-medium">{seller.countryOfRegistration}</p>
                                       </div>
@@ -829,6 +885,16 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                                           <SelectItem value="very-high">Very High</SelectItem>
                                         </SelectContent>
                                       </Select>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground mb-1">Product Categories</p>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {seller.primaryProductCategories.map((cat) => (
+                                          <span key={cat} className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                                            {cat}
+                                          </span>
+                                        ))}
+                                      </div>
                                     </div>
                                   </CardContent>
                                 </Card>
