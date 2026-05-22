@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, Plus, ExternalLink, Download, X, ChevronDown, Check, Filter } from 'lucide-react'
-import type { Seller, PipelineStage, PriorityLevel, SellerCategory, IntegrationMethod, Agency, PipelineType } from '@/lib/types/seller'
+import type { Seller, PipelineStage, PriorityLevel, SellerCategory, IntegrationMethod, Agency, PipelineType, SellerStatus } from '@/lib/types/seller'
 import { getStageDefinition, getPriorityColor, acquisitionStages, onboardingStages, accountManagementStages, pipelines } from '@/lib/data/pipeline-stages'
 import { 
   acquisitionManagers, 
@@ -69,7 +69,14 @@ const filterColors: Record<string, { bg: string; text: string; border: string }>
   pipeline: { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-200' },
   stage: { bg: 'bg-rose-100', text: 'text-rose-700', border: 'border-rose-200' },
   priority: { bg: 'bg-cyan-100', text: 'text-cyan-700', border: 'border-cyan-200' },
+  status: { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200' },
 }
+
+const statusOptions: { value: SellerStatus; label: string }[] = [
+  { value: 'active', label: 'Active' },
+  { value: 'delayed', label: 'Delayed' },
+  { value: 'terminated', label: 'Terminated' },
+]
 
 interface FilterDropdownProps<T extends string> {
   label: string
@@ -158,6 +165,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
   const [selectedPipelines, setSelectedPipelines] = useState<PipelineType[]>([])
   const [selectedStages, setSelectedStages] = useState<PipelineStage[]>([])
   const [selectedPriorities, setSelectedPriorities] = useState<PriorityLevel[]>([])
+  const [selectedStatuses, setSelectedStatuses] = useState<SellerStatus[]>([])
 
   const toggleFilter = <T,>(
     value: T,
@@ -177,6 +185,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     setSelectedPipelines([])
     setSelectedStages([])
     setSelectedPriorities([])
+    setSelectedStatuses([])
     setSearchQuery('')
   }
 
@@ -247,6 +256,11 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
           if (!matchesPriority) return false
         }
 
+        // Status filter
+        if (selectedStatuses.length > 0 && !selectedStatuses.includes(seller.status)) {
+          return false
+        }
+
         return true
       })
       .sort((a, b) => {
@@ -267,6 +281,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedPipelines,
     selectedStages,
     selectedPriorities,
+    selectedStatuses,
     sortBy,
     sortOrder,
   ])
@@ -339,6 +354,7 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedPipelines.length > 0 ||
     selectedStages.length > 0 ||
     selectedPriorities.length > 0 ||
+    selectedStatuses.length > 0 ||
     searchQuery.length > 0
 
   const totalActiveFilters = 
@@ -348,7 +364,8 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
     selectedManagers.length +
     selectedPipelines.length +
     selectedStages.length +
-    selectedPriorities.length
+    selectedPriorities.length +
+    selectedStatuses.length
 
   const activeFilterChips: { label: string; type: keyof typeof filterColors; onRemove: () => void }[] = [
     ...selectedCategories.map((c) => ({
@@ -385,6 +402,11 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
       label: priorityOptions.find((o) => o.value === p)?.label || p,
       type: 'priority' as const,
       onRemove: () => toggleFilter(p, selectedPriorities, setSelectedPriorities),
+    })),
+    ...selectedStatuses.map((s) => ({
+      label: statusOptions.find((o) => o.value === s)?.label || s,
+      type: 'status' as const,
+      onRemove: () => toggleFilter(s, selectedStatuses, setSelectedStatuses),
     })),
   ]
 
@@ -518,6 +540,14 @@ export function PartnersTable({ sellers }: PartnersTableProps) {
               selected={selectedPriorities}
               onToggle={(v) => toggleFilter(v, selectedPriorities, setSelectedPriorities)}
               colorKey="priority"
+            />
+
+            <FilterDropdown
+              label="Status"
+              options={statusOptions}
+              selected={selectedStatuses}
+              onToggle={(v) => toggleFilter(v, selectedStatuses, setSelectedStatuses)}
+              colorKey="status"
             />
 
             {hasActiveFilters && (
