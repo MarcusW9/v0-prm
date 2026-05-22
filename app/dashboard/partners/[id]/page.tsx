@@ -1189,6 +1189,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           </div>
                         </div>
                       </div>
+                      )}
 
                       {/* Warning Notice */}
                       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex items-start gap-2">
