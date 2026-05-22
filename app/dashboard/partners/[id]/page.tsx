@@ -93,20 +93,6 @@ interface SortableCardProps {
   isFullWidth?: boolean
 }
 
-// Helper to get human-readable reason labels
-const reasonLabels: Record<string, string> = {
-  'awaiting-documents': 'Awaiting documents from seller',
-  'compliance-review': 'Pending compliance review',
-  'seller-request': 'Requested by seller',
-  'internal-review': 'Internal review required',
-  'compliance-failure': 'Failed compliance requirements',
-  'seller-withdrew': 'Seller withdrew application',
-  'business-closed': 'Business closed',
-  'duplicate': 'Duplicate entry',
-  'fraud': 'Suspected fraud',
-  'other': 'Other',
-}
-
 function SortableCard({ id, children, isFullWidth = false }: SortableCardProps) {
   const {
     attributes,
@@ -153,8 +139,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   
   // Seller lifecycle status state
   const [sellerStatus, setSellerStatus] = useState<'active' | 'delayed' | 'terminated'>('active')
-  const [statusReason, setStatusReason] = useState('')
-  const [statusNotes, setStatusNotes] = useState('')
   const [delayedReason, setDelayedReason] = useState('')
   const [delayedNotes, setDelayedNotes] = useState('')
   const [terminateReason, setTerminateReason] = useState('')
@@ -163,11 +147,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   // Terminate confirmation dialog state
   const [showTerminateDialog, setShowTerminateDialog] = useState(false)
   const [terminateConfirmText, setTerminateConfirmText] = useState('')
-  
-  // Reactivation confirmation dialog state (when changing stage while delayed)
-  const [showReactivateDialog, setShowReactivateDialog] = useState(false)
-  const [pendingReactivateStage, setPendingReactivateStage] = useState<AcquisitionStage | null>(null)
-  const [shouldReactivateAfterIncomplete, setShouldReactivateAfterIncomplete] = useState(false)
   
   // Drag and drop for overview sections
   const [sectionOrder, setSectionOrder] = useState([
@@ -296,13 +275,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
   }
 
   const handleStageChange = (newStage: AcquisitionStage) => {
-    // If seller is delayed, show reactivation confirmation first
-    if (sellerStatus === 'delayed') {
-      setPendingReactivateStage(newStage)
-      setShowReactivateDialog(true)
-      return
-    }
-    
     // Check if current stage has incomplete items
     const currentChecklist = getChecklistForStage(currentStage)
     if (currentChecklist) {
@@ -319,45 +291,15 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
     completeStageChange(newStage)
   }
 
-  const completeStageChange = (newStage: AcquisitionStage, reactivate: boolean = false) => {
+  const completeStageChange = (newStage: AcquisitionStage) => {
     setCurrentStage(newStage)
-    if (reactivate) {
-      setSellerStatus('active')
-      setStatusReason('')
-      setStatusNotes('')
-      toast.success(`Seller reactivated and moved to ${getStageDefinition(newStage)?.label || newStage}`)
-    } else {
-      toast.success(`Moved to ${getStageDefinition(newStage)?.label || newStage}`)
-    }
-  }
-
-  const handleConfirmReactivateMove = () => {
-    if (pendingReactivateStage) {
-      // Check for incomplete items before completing
-      const currentChecklist = getChecklistForStage(currentStage)
-      if (currentChecklist) {
-        const missing = hasIncompleteItems(currentChecklist, checklistProgress)
-        if (missing.length > 0) {
-          setIncompleteItems(missing)
-          setPendingStageChange(pendingReactivateStage)
-          setShouldReactivateAfterIncomplete(true)
-          setShowReactivateDialog(false)
-          setShowIncompleteDialog(true)
-          setPendingReactivateStage(null)
-          return
-        }
-      }
-      completeStageChange(pendingReactivateStage, true)
-      setPendingReactivateStage(null)
-    }
-    setShowReactivateDialog(false)
+    toast.success(`Moved to ${getStageDefinition(newStage)?.label || newStage}`)
   }
 
   const handleConfirmIncompleteMove = () => {
     if (pendingStageChange) {
-      completeStageChange(pendingStageChange, shouldReactivateAfterIncomplete)
+      completeStageChange(pendingStageChange)
       setPendingStageChange(null)
-      setShouldReactivateAfterIncomplete(false)
     }
     setShowIncompleteDialog(false)
   }
@@ -511,52 +453,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 {/* Contact Info */}
                 <div className="p-4">
                   <div className="space-y-3">
-                    {/* Status Info Bubble - shown when delayed or terminated */}
-                    {sellerStatus !== 'active' && statusReason && (
-                      <div className={cn(
-                        "rounded-lg p-3 border",
-                        sellerStatus === 'delayed' 
-                          ? "bg-amber-50 border-amber-200" 
-                          : "bg-red-50 border-red-200"
-                      )}>
-                        <div className="flex items-center gap-2 mb-2">
-                          {sellerStatus === 'delayed' ? (
-                            <Clock className="h-4 w-4 text-amber-600" />
-                          ) : (
-                            <Ban className="h-4 w-4 text-red-600" />
-                          )}
-                          <span className={cn(
-                            "text-sm font-semibold",
-                            sellerStatus === 'delayed' ? "text-amber-700" : "text-red-700"
-                          )}>
-                            {sellerStatus === 'delayed' ? 'Delayed' : 'Terminated'}
-                          </span>
-                        </div>
-                        <div className="space-y-1.5">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Reason</p>
-                            <p className={cn(
-                              "text-xs font-medium",
-                              sellerStatus === 'delayed' ? "text-amber-800" : "text-red-800"
-                            )}>
-                              {reasonLabels[statusReason] || statusReason}
-                            </p>
-                          </div>
-                          {statusNotes && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Supporting Notes</p>
-                              <p className={cn(
-                                "text-xs",
-                                sellerStatus === 'delayed' ? "text-amber-800" : "text-red-800"
-                              )}>
-                                {statusNotes}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
                     {seller.websiteUrl && (
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Website</p>
@@ -1232,8 +1128,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                               disabled={!delayedReason || !delayedNotes.trim()}
                               onClick={() => {
                                 setSellerStatus('delayed')
-                                setStatusReason(delayedReason)
-                                setStatusNotes(delayedNotes)
                                 toast.success('Seller marked as delayed')
                                 setDelayedReason('')
                                 setDelayedNotes('')
@@ -1287,7 +1181,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                             <Button 
                               variant="outline" 
                               className="border-red-300 text-red-700 hover:bg-red-50"
-                              disabled={!terminateReason || !terminateNotes.trim()}
                               onClick={() => setShowTerminateDialog(true)}
                             >
                               <Ban className="h-4 w-4 mr-2" />
@@ -1296,7 +1189,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           </div>
                         </div>
                       </div>
-                      )}
 
                       {/* Warning Notice */}
                       <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex items-start gap-2">
@@ -1320,44 +1212,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           incompleteItems={incompleteItems}
           onConfirm={handleConfirmIncompleteMove}
         />
-
-        {/* Reactivation Confirmation Dialog */}
-        <Dialog open={showReactivateDialog} onOpenChange={setShowReactivateDialog}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-emerald-700 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5" />
-                Confirm Reactivation
-              </DialogTitle>
-              <DialogDescription>
-                Changing the stage will reactivate this seller and change their status from <span className="font-semibold text-amber-600">Delayed</span> back to <span className="font-semibold text-emerald-600">Active</span>.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <p className="text-sm text-muted-foreground">
-                The seller will be moved to the selected stage and returned to active status in the pipeline.
-              </p>
-            </div>
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowReactivateDialog(false)
-                  setPendingReactivateStage(null)
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
-                onClick={handleConfirmReactivateMove}
-              >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                Reactivate & Change Stage
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
         {/* Terminate Confirmation Dialog */}
         <Dialog open={showTerminateDialog} onOpenChange={(open) => {
@@ -1400,8 +1254,6 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                 disabled={terminateConfirmText.toLowerCase() !== 'terminate'}
                 onClick={() => {
                   setSellerStatus('terminated')
-                  setStatusReason(terminateReason)
-                  setStatusNotes(terminateNotes)
                   toast.success('Seller has been terminated')
                   setShowTerminateDialog(false)
                   setTerminateConfirmText('')
