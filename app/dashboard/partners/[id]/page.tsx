@@ -370,18 +370,28 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsTrigger>
             </TabsList>
           </div>
-          <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
-            <SelectTrigger className="w-40 h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {acquisitionStages.map((stage) => (
-                <SelectItem key={stage.id} value={stage.id}>
-                  {stage.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {sellerStatus === 'terminated' ? (
+            <Badge
+              variant="secondary"
+              className="h-9 px-4 text-sm bg-red-100 text-red-700 border-red-200 flex items-center gap-2"
+            >
+              <Ban className="h-4 w-4" />
+              Terminated
+            </Badge>
+          ) : (
+            <Select value={currentStage} onValueChange={(val) => handleStageChange(val as AcquisitionStage)}>
+              <SelectTrigger className="w-40 h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {acquisitionStages.map((stage) => (
+                  <SelectItem key={stage.id} value={stage.id}>
+                    {stage.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         <div className="flex flex-1 overflow-hidden">
