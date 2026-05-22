@@ -1056,18 +1056,34 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                       <div className="rounded-lg border border-amber-200 bg-white p-4">
                         <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Current Status</p>
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                            Active
-                          </span>
+                          {sellerStatus === 'active' && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              Active
+                            </span>
+                          )}
+                          {sellerStatus === 'delayed' && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
+                              <Clock className="h-3.5 w-3.5" />
+                              Delayed
+                            </span>
+                          )}
+                          {sellerStatus === 'terminated' && (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                              <Ban className="h-3.5 w-3.5" />
+                              Terminated
+                            </span>
+                          )}
                         </div>
                       </div>
 
-                      {/* Status Change Options */}
+                      {/* Status Change Options - only show if not terminated */}
+                      {sellerStatus !== 'terminated' && (
                       <div className="space-y-4">
                         <p className="text-sm font-medium text-amber-800">Change Status To:</p>
                         
-                        {/* Delayed Option */}
+                        {/* Delayed Option - only show if currently active */}
+                        {sellerStatus === 'active' && (
                         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-4">
                           <div className="flex items-start gap-3">
                             <div className="p-2 rounded-full bg-amber-100">
@@ -1084,7 +1100,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           <div className="space-y-3 pl-11">
                             <div className="space-y-2">
                               <label className="text-sm font-medium">Reason <span className="text-red-500">*</span></label>
-                              <Select>
+                              <Select value={delayedReason} onValueChange={setDelayedReason}>
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a reason" />
                                 </SelectTrigger>
@@ -1102,18 +1118,27 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                               <Textarea 
                                 placeholder="Provide details about why this seller is being delayed..."
                                 className="min-h-[80px]"
+                                value={delayedNotes}
+                                onChange={(e) => setDelayedNotes(e.target.value)}
                               />
                             </div>
                             <Button 
                               variant="outline" 
                               className="border-amber-300 text-amber-700 hover:bg-amber-50"
-                              onClick={() => toast.success('Seller marked as delayed')}
+                              disabled={!delayedReason || !delayedNotes.trim()}
+                              onClick={() => {
+                                setSellerStatus('delayed')
+                                toast.success('Seller marked as delayed')
+                                setDelayedReason('')
+                                setDelayedNotes('')
+                              }}
                             >
                               <Clock className="h-4 w-4 mr-2" />
                               Mark as Delayed
                             </Button>
                           </div>
                         </div>
+                        )}
 
                         {/* Terminated Option */}
                         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-4">
