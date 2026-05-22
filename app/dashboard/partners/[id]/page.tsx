@@ -1287,6 +1287,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                             <Button 
                               variant="outline" 
                               className="border-red-300 text-red-700 hover:bg-red-50"
+                              disabled={!terminateReason || !terminateNotes.trim()}
                               onClick={() => setShowTerminateDialog(true)}
                             >
                               <Ban className="h-4 w-4 mr-2" />
