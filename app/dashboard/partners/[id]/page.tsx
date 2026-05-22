@@ -1054,8 +1054,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsContent>
 
               <TabsContent value="notes" className="mt-0 h-full">
-                <Card className="h-full">
-                  <CardContent className="pt-6 h-full">
+                <Card className="h-full flex flex-col">
+                  <CardContent className="pt-6 flex-1 flex flex-col">
                     {/* Add New Note */}
                     <div className="space-y-3 mb-6">
                       <Textarea
@@ -1073,7 +1073,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     <Separator className="my-6" />
 
                     {/* Notes List */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex-1">
                       {sellerNotes.length === 0 ? (
                         <p className="text-sm text-muted-foreground text-center py-4">
                           No notes yet. Add the first note above.
@@ -1106,8 +1106,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
               </TabsContent>
 
               <TabsContent value="files" className="mt-0 h-full">
-                <Card className="h-full">
-                  <CardContent className="pt-6 h-full">
+                <Card className="h-full flex flex-col">
+                  <CardContent className="pt-6 flex-1 flex flex-col">
                     {/* Upload Area */}
                     <div
                       className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted p-8 text-center cursor-pointer hover:border-muted-foreground/50 transition-colors mb-6"
@@ -1119,7 +1119,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                     </div>
 
                     {/* Files List */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex-1">
                       {sellerFiles.length === 0 ? (
                         <p className="text-sm text-muted-foreground text-center py-4">
                           No files uploaded yet.
