@@ -1263,7 +1263,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                           <div className="space-y-3 pl-11">
                             <div className="space-y-2">
                               <label className="text-sm font-medium">Reason <span className="text-red-500">*</span></label>
-                              <Select>
+                              <Select value={terminateReason} onValueChange={setTerminateReason}>
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a reason" />
                                 </SelectTrigger>
@@ -1282,6 +1282,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                               <Textarea 
                                 placeholder="Provide details about why this seller is being terminated..."
                                 className="min-h-[80px]"
+                                value={terminateNotes}
+                                onChange={(e) => setTerminateNotes(e.target.value)}
                               />
                             </div>
                             <Button 
