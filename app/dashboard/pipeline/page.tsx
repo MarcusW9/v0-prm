@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { KanbanBoard } from '@/components/pipeline/kanban-board'
 import { PipelineToggle } from '@/components/pipeline/pipeline-toggle'
@@ -15,7 +15,7 @@ const pipelineDescriptions: Record<PipelineType, string> = {
 
 const validPipelineTypes: PipelineType[] = ['acquisition', 'onboarding', 'account-management']
 
-export default function PipelinePage() {
+function PipelineContent() {
   const searchParams = useSearchParams()
   const viewParam = searchParams.get('view')
   
@@ -49,5 +49,25 @@ export default function PipelinePage() {
         <KanbanBoard sellers={mockSellers} pipelineType={activeView} />
       </div>
     </div>
+  )
+}
+
+export default function PipelinePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-full flex-col">
+        <div className="border-b bg-white px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Pipeline</h1>
+              <p className="text-sm text-slate-500">Loading...</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 overflow-hidden p-6" />
+      </div>
+    }>
+      <PipelineContent />
+    </Suspense>
   )
 }
