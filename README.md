@@ -1,34 +1,10 @@
-# v0-prm
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
-
-## Built with v0
-
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
-
-[Continue working on v0 →](https://v0.app/chat/projects/prj_k8xrPYgjVP9kmwVojamQjFokdRuE)
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
 # Argos Partner Hub (`v0-prm`)
 
 **A Partner Relationship Management (PRM) front-end for marketplace seller operations — tracking sellers across Acquisition, Onboarding, and Account Management pipelines with stage-gated checklists.**
 
-> **Status: UI prototype.** Every screen renders from a static in-memory fixture (`lib/data/mock-sellers.ts`). There is no database, no API layer, and no authentication in this repository. All mutations are React component state and are lost on refresh. See [Known Technical Debt](#7-known-technical-debt--vibecode-considerations) before planning production work.
+> **Status: UI prototype.** Every screen renders from a static in-memory fixture (`lib/data/mock-sellers.ts`). There is no database, no API layer, and no authentication in this repository. All mutations are React component state and are lost on refresh. See [Known Technical Debt](#6-known-technical-debt--vibecode-considerations) before planning production work.
+
+**Built with [v0](https://v0.app).** This repository is linked to a v0 project — new chats there push commits directly to this repo, and every merge to `main` auto-deploys. [Continue working on v0 →](https://v0.app/chat/projects/prj_k8xrPYgjVP9kmwVojamQjFokdRuE) See [Note on the v0 sync](#note-on-the-v0-sync) before editing files here by hand.
 
 ---
 
@@ -81,7 +57,7 @@ Legend: ✅ Implemented · 🟡 Partial / UI-only (no persistence) · 🔴 Stub 
 | Per-stage checklists | ✅ | `lib/data/stage-checklists.ts` — checkbox / dropdown / text / currency item types. |
 | Checklist gating on stage advance | 🟡 | `handleStageChange` → `IncompleteChecklistDialog`. Enforced on the **detail page dropdown only**; the Kanban drag bypasses it entirely. |
 | Priority scoring | ✅ | 1.0–5.0 scale → Critical / High / Medium / Low bands via `getPriorityLevel`. Note: the scale is **inverted** — a *lower* score is a *higher* priority. |
-| Pipeline filters (SAM manager, priority) | 🔴 | Renders, but the manager filter is broken — see technical debt §7.2. |
+| Pipeline filters (SAM manager, priority) | 🔴 | Renders, but the manager filter is broken — see technical debt §6.2. |
 | "Group by SAM Manager" checkbox | 🔴 | Renders with no bound state or handler. |
 
 ### Partner Detail Workspace (`/dashboard/partners/[id]`)
@@ -97,7 +73,7 @@ Legend: ✅ Implemented · 🟡 Partial / UI-only (no persistence) · 🔴 Stub 
 | Management tab | 🟡 | Editable trading name / email / phone / URL; Save fires a toast and discards the values (uncontrolled `defaultValue` inputs). |
 | Lifecycle status (Active / Delayed / Terminated) | 🟡 | Reason + notes capture, type-to-confirm termination dialog, and a reactivation-on-stage-change flow. Well-modelled UX; state only. |
 | Mirakl shop linking | 🔴 | `miraklName` / `miraklId` inputs auto-fill a fake padded ID (`ID:0001`). No Mirakl API call. Note the fixture field is misspelled `mirakiLinked`. |
-| Contact management | 🟡 | Primary + additional contacts, add/edit/delete dialogs, role taxonomy. Contains a React bug — see §7.3. |
+| Contact management | 🟡 | Primary + additional contacts, add/edit/delete dialogs, role taxonomy. Contains a React bug — see §6.3. |
 
 ### Partner Directory (`/dashboard/partners`)
 
@@ -105,9 +81,9 @@ Legend: ✅ Implemented · 🟡 Partial / UI-only (no persistence) · 🔴 Stub 
 |---|---|---|
 | Sortable table | ✅ | Sort by name or stage, asc/desc. |
 | Free-text search | ✅ | Matches company name, primary contact name, and primary contact email. |
-| Multi-select filter bar | 🟡 | 8 dimensions: category, integration, agency, manager, pipeline, stage, priority, status. Seven work; **status is broken** (§7.2). |
+| Multi-select filter bar | 🟡 | 8 dimensions: category, integration, agency, manager, pipeline, stage, priority, status. Seven work; **status is broken** (§6.2). |
 | Active filter chips with individual removal | ✅ | |
-| CSV export | 🟡 | 16-column client-side export. **Unescaped** — see §7.5. |
+| CSV export | 🟡 | 16-column client-side export. **Unescaped** — see §6.5. |
 
 ### Integrations / API Middleware
 
@@ -137,7 +113,7 @@ Legend: ✅ Implemented · 🟡 Partial / UI-only (no persistence) · 🔴 Stub 
 |---|---|
 | Framework | Next.js **16.2.6** (App Router) |
 | Runtime | React **19.2.4** |
-| Language | TypeScript **5.7.3** (`strict: true`, but see §7.1) |
+| Language | TypeScript **5.7.3** (`strict: true`, but see §6.1) |
 | Styling | Tailwind CSS **4.2** via `@tailwindcss/postcss`, `tw-animate-css` |
 | Components | shadcn/ui (New York style) over Radix UI primitives — 50+ components in `components/ui` |
 | Drag & drop | `@dnd-kit/core`, `@dnd-kit/sortable` |
@@ -364,7 +340,7 @@ Open <http://localhost:3000> — it redirects to `/dashboard/pipeline?view=acqui
 | Command | Purpose |
 |---|---|
 | `pnpm dev` | Dev server with HMR |
-| `pnpm build` | Production build (**TypeScript errors are suppressed** — see §7.1) |
+| `pnpm build` | Production build (**TypeScript errors are suppressed** — see §6.1) |
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | ⚠️ **Currently fails** — the script calls `eslint .` but ESLint is not a dependency and no config file exists |
 
