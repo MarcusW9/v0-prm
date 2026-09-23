@@ -1,5 +1,7 @@
 export type PriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'no-score'
 
+export type SellerStatus = 'active' | 'delayed' | 'terminated'
+
 export type AcquisitionStage =
   | 'identified'
   | 'prospecting'
@@ -97,8 +99,9 @@ export interface Seller {
   companiesHousePass: boolean
   dnbPass: boolean // Dun & Bradstreet
   rejectionReason: string | null
-  mirakiLinked: boolean
+  miraklLinked: boolean
   healthStatus: 'healthy' | 'at-risk' | 'critical' | null
+  status: SellerStatus
   createdAt: Date
   updatedAt: Date
   checklistProgress?: StageChecklistCompletion[] // Track completion per stage

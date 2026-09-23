@@ -72,7 +72,7 @@ Legend: ✅ Implemented · 🟡 Partial / UI-only (no persistence) · 🔴 Stub 
 | Files tab | 🔴 | Reads `mockFiles`; upload button fires `toast.success('File upload functionality coming soon')`. No storage backend. |
 | Management tab | 🟡 | Editable trading name / email / phone / URL; Save fires a toast and discards the values (uncontrolled `defaultValue` inputs). |
 | Lifecycle status (Active / Delayed / Terminated) | 🟡 | Reason + notes capture, type-to-confirm termination dialog, and a reactivation-on-stage-change flow. Well-modelled UX; state only. |
-| Mirakl shop linking | 🔴 | `miraklName` / `miraklId` inputs auto-fill a fake padded ID (`ID:0001`). No Mirakl API call. Note the fixture field is misspelled `mirakiLinked`. |
+| Mirakl shop linking | 🔴 | `miraklName` / `miraklId` inputs auto-fill a fake padded ID (`ID:0001`). No Mirakl API call. |
 | Contact management | 🟡 | Primary + additional contacts, add/edit/delete dialogs, role taxonomy. Contains a React bug — see §6.3. |
 
 ### Partner Directory (`/dashboard/partners`)
@@ -146,7 +146,8 @@ Seller
 ├── Filter dimensions   category, integrationMethod, agency, daysIdle
 ├── Commercial          gmvPotential
 ├── Compliance          companiesHousePass, dnbPass, rejectionReason
-├── Platform            mirakiLinked  [sic]
+├── Platform            miraklLinked
+├── Lifecycle           status (active / delayed / terminated)
 ├── Health              healthStatus
 └── Progress            checklistProgress?: StageChecklistCompletion[]
 ```
@@ -283,13 +284,12 @@ flowchart LR
     G --> H{"pipeline"}
     H --> I{"stage"}
     I --> J{"priority band"}
-    J --> K{"status ⚠️ broken"}
+    J --> K{"status"}
     K --> L["sort — name or stage"]
     L --> M["Table render"]
     L --> N["exportToCSV<br/>16 columns ⚠️ unescaped"]
     N --> O["Blob → object URL → download"]
 
-    style K fill:#fee2e2,stroke:#dc2626
     style N fill:#fef3c7,stroke:#d97706
 ```
 
@@ -333,7 +333,7 @@ pnpm install
 pnpm dev
 ```
 
-Open <http://localhost:3000> — it redirects to `/dashboard/pipeline?view=acquisition`.
+Open the local dev URL — it redirects to `/dashboard/pipeline?view=acquisition`.
 
 ### Commands
 
@@ -354,7 +354,7 @@ Once a backend lands, the first variables will be roughly:
 # .env.example — ANTICIPATED, none of these are read today
 DATABASE_URL=
 NEXTAUTH_SECRET=
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=
 MIRAKL_API_URL=
 MIRAKL_API_KEY=
 COMPANIES_HOUSE_API_KEY=
@@ -379,25 +379,25 @@ Ordered by how much damage each will do if it reaches production.
 typescript: { ignoreBuildErrors: true }
 ```
 
-`tsconfig.json` sets `strict: true`, and then the build throws the result away. This is not theoretical — it is actively hiding the two broken filters below. **Remove this flag, fix what falls out, and keep it removed.** It is the single highest-value hour of work in the repo.
+`tsconfig.json` sets `strict: true`, and then the build throws the result away. This is not theoretical — it was actively hiding several broken filters and missing type fields (§6.2). **Remove this flag, fix what falls out, and keep it removed.** It is the single highest-value hour of work in the repo.
 
-### 6.2 Two filters are silently broken 🔴
+### 6.2 Filters and fields that referenced non-existent properties 🔴
 
-**Pipeline SAM Manager filter** — `kanban-board.tsx:55` reads a property that does not exist:
+**Pipeline SAM Manager filter** — `kanban-board.tsx` used to read a property that did not exist:
 
 ```ts
 if (samManagerFilter !== 'all' && seller.samManager !== samManagerFilter) return false
 ```
 
-`Seller` has `acquisitionManager`, `onboardingManager`, and `accountManager` — there is no `samManager`. The comparison is always `undefined !== '<name>'`, so **selecting any manager empties the entire board**. It should read the manager field matching the active pipeline.
+`Seller` has `acquisitionManager`, `onboardingManager`, and `accountManager` — there is no `samManager`. Fixed to read the manager field matching the active pipeline (`pipelineType`).
 
-**Partners table status filter** — `partners-table.tsx:260` reads `seller.status`, and `partners-table.tsx:6` imports a `SellerStatus` type that `lib/types/seller.ts` does not export. Lifecycle status lives only in the detail page's local state and was never added to the `Seller` model. Selecting any status value **empties the table**.
+**Partners table status filter** — previously read `seller.status` when `SellerStatus` was not exported from `lib/types/seller.ts` and `status` was not a field on `Seller`. Fixed: `SellerStatus` is now exported (`'active' | 'delayed' | 'terminated'`) and every seller fixture carries a `status` field.
 
-Both are compile errors. Both are invisible because of §6.1.
+Both were compile errors, invisible only because of §6.1.
 
 ### 6.3 `useState` used as `useEffect` 🟡
 
-`components/partner/contact-management.tsx:182`:
+`components/partner/contact-management.tsx`:
 
 ```ts
 useState(() => {
@@ -439,7 +439,6 @@ Every `/dashboard` route is publicly reachable. The sidebar user is hardcoded to
 | Type cast papers over the union | `{ ...seller, stage: targetStageId as string }` — `stage` is a `PipelineStage` union, not `string` |
 | `required` flag ignored | `hasIncompleteItems` filters on `!progress[id]?.completed` and never reads `ChecklistItem.required`, so every optional item blocks advancement |
 | Dead controls | `Add Partner` (no handler), `Group by SAM Manager` (unbound checkbox), sidebar Profile / Account Settings / Sign out |
-| Fixture typo | `mirakiLinked` should be `miraklLinked` — rename before it reaches a schema |
 | Duplicate stylesheet | `styles/globals.css` is byte-identical to `app/globals.css` and unused; delete it |
 | Static `daysIdle` | A fixture integer, not derived from stage-entry timestamps — so the idle-partner signal is decorative |
 | Unused dependencies | `recharts`, `zod`, `react-hook-form`, `@hookform/resolvers` are installed but never imported; adopt them for forms or drop them |
@@ -459,7 +458,7 @@ Not feature work, but nothing below is safe to build on until it is done.
 2. Fix the SAM manager and status filters — **§6.2**
 3. Fix `useState` → `useEffect` in contact management — **§6.3**
 4. Add ESLint as a dependency with a config so `pnpm lint` runs — **§5**
-5. Delete `styles/globals.css`; rename `mirakiLinked` — **§6.8**
+5. Delete `styles/globals.css`
 
 ### Horizon 1 — Immediate growth friction (1–2 weeks)
 
@@ -489,7 +488,3 @@ Not feature work, but nothing below is safe to build on until it is done.
 | Inventory platform integrations (Linnworks, ChannelAdvisor, Brightpearl) | GMV |
 | AI catalog enrichment — images, specs, variants — on top of a working ingestion pipeline | SKU Quality |
 | Seller-facing self-serve portal | Onboarding Velocity |
-
----
-
-*Generated from a full read of `main` @ `8a8208f`, 21 September 2026. Feature statuses reflect the code as committed, not intent.*

@@ -740,7 +740,7 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
                               </Avatar>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs text-muted-foreground mb-0.5">
-                                  {note.author} • {formatDate(note.createdAt)}
+                                  {note.authorName} • {formatDate(note.createdAt)}
                                 </p>
                                 <p className="text-sm text-foreground line-clamp-2">
                                   {note.content}
@@ -1386,6 +1386,8 @@ export default function PartnerDetailPage({ params }: PartnerDetailPageProps) {
           open={showIncompleteDialog}
           onOpenChange={setShowIncompleteDialog}
           incompleteItems={incompleteItems}
+          fromStage={getStageDefinition(currentStage)?.label || currentStage}
+          toStage={pendingStageChange ? (getStageDefinition(pendingStageChange)?.label || pendingStageChange) : ''}
           onConfirm={handleConfirmIncompleteMove}
         />
 
