@@ -1,12 +1,13 @@
 export type PriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'no-score'
 
 export type AcquisitionStage =
-  | 'identified'
-  | 'prospecting'
-  | 'pitched'
-  | 'vetting'
-  | 'compliance'
-  | 'signoff'
+  | 'initial-contact'
+  | 'recruiting'
+  | 'unresponsive'
+  | 'handed-off'
+  | 'on-hold'
+  | 'pending-approval'
+  | 'approved'
 
 export type OnboardingStage =
   | 'shop-created'
@@ -26,72 +27,42 @@ export type PipelineStage = AcquisitionStage | OnboardingStage | AccountManageme
 
 export type PipelineType = 'acquisition' | 'onboarding' | 'account-management'
 
-// Checklist completion tracking
-export interface ChecklistItemCompletion {
-  itemId: string
-  completed: boolean
-  value?: string // For dropdown, text, or currency types
-  completedAt?: Date
-  completedBy?: string
-}
+export type SellerStatus = 'active' | 'delayed' | 'terminated'
 
-export interface StageChecklistCompletion {
-  stageId: PipelineStage
-  enteredAt: Date
-  items: ChecklistItemCompletion[]
-}
+export type DelayedReason = 
+  | 'awaiting-seller-response'
+  | 'compliance-review'
+  | 'internal-capacity'
+  | 'seasonal-timing'
+  | 'other'
 
-export type SellerCategory = 'electronics' | 'home' | 'toys' | 'garden' | 'kitchen' | 'furniture' | 'lighting' | 'other'
+export type TerminatedReason = 
+  | 'seller-withdrew'
+  | 'compliance-failure'
+  | 'business-decision'
+  | 'duplicate-application'
+  | 'fraudulent-activity'
+  | 'other'
 
-export type IntegrationMethod = 'linnworks' | 'channelAdvisor' | 'brightpearl' | 'tradegecko' | 'manual' | 'other'
-
-export type Agency = 'time-online' | 'ecommerce-agency' | 'retail-solutions' | 'direct' | 'other'
-
-export type ContactRole = 'account' | 'technical' | 'operations' | 'commercial' | 'other'
-
-export interface Contact {
+export interface StatusChangeRecord {
   id: string
-  name: string
-  email: string
-  phone: string
-  role: ContactRole
-  roleDescription?: string // Free text for 'other' role
-}
-
-export interface RegisteredAddress {
-  line1: string
-  line2?: string
-  city: string
-  postcode: string
-  country: string
+  status: SellerStatus
+  reason: DelayedReason | TerminatedReason | null
+  notes: string
+  changedBy: string
+  changedAt: Date
 }
 
 export interface Seller {
   id: string
-  // Legal Identity (read-only in UI)
   companyName: string
   crn: string // Company Registration Number
-  countryOfRegistration: string
-  vatNumber: string | null
-  registeredAddress: RegisteredAddress
-  // Business Details
-  websiteUrl: string | null
-  primaryProductCategories: string[] // e.g. ['toys', 'games']
-  numberOfProductsExpected: number | null
-  // Primary contact (mandatory)
-  primaryContact: Contact
-  // Additional contacts (optional array)
-  additionalContacts: Contact[]
+  contactName: string
+  contactEmail: string
   priorityScore: number | null // 1.0 - 5.0 scale, null for no score
   pipeline: PipelineType
   stage: PipelineStage
-  acquisitionManager: string | null
-  onboardingManager: string | null
-  accountManager: string | null
-  // Filter dimensions
-  category: SellerCategory
-  integrationMethod: IntegrationMethod | null
-  agency: Agency
+  samManager: string
   daysIdle: number
   gmvPotential: 'low' | 'medium' | 'high' | 'very-high' | null
   companiesHousePass: boolean
@@ -99,9 +70,14 @@ export interface Seller {
   rejectionReason: string | null
   mirakiLinked: boolean
   healthStatus: 'healthy' | 'at-risk' | 'critical' | null
+  status: SellerStatus
+  statusReason: DelayedReason | TerminatedReason | null
+  statusNotes: string | null
+  statusChangedAt: Date | null
+  statusChangedBy: string | null
+  statusHistory: StatusChangeRecord[]
   createdAt: Date
   updatedAt: Date
-  checklistProgress?: StageChecklistCompletion[] // Track completion per stage
 }
 
 export interface Note {

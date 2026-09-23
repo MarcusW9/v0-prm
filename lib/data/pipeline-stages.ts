@@ -1,12 +1,13 @@
 import type { PipelineDefinition, StageDefinition, PipelineType, PipelineStage } from '@/lib/types/seller'
 
 export const acquisitionStages: StageDefinition[] = [
-  { id: 'identified', label: 'Identified', color: 'text-indigo-700', bgColor: 'bg-indigo-50' },
-  { id: 'prospecting', label: 'Prospecting', color: 'text-amber-700', bgColor: 'bg-amber-50' },
-  { id: 'pitched', label: 'Pitched', color: 'text-yellow-700', bgColor: 'bg-yellow-50' },
-  { id: 'vetting', label: 'Vetting', color: 'text-orange-700', bgColor: 'bg-orange-50' },
-  { id: 'compliance', label: 'Compliance', color: 'text-blue-700', bgColor: 'bg-blue-50' },
-  { id: 'signoff', label: 'Signoff', color: 'text-emerald-700', bgColor: 'bg-emerald-50' },
+  { id: 'initial-contact', label: 'Initial Contact', color: 'text-amber-700', bgColor: 'bg-amber-50' },
+  { id: 'recruiting', label: 'Recruiting', color: 'text-yellow-700', bgColor: 'bg-yellow-50' },
+  { id: 'unresponsive', label: 'Unresponsive', color: 'text-slate-600', bgColor: 'bg-slate-50' },
+  { id: 'handed-off', label: 'Handed Off', color: 'text-orange-700', bgColor: 'bg-orange-50' },
+  { id: 'on-hold', label: 'On Hold', color: 'text-slate-600', bgColor: 'bg-slate-100' },
+  { id: 'pending-approval', label: 'Pending Approval', color: 'text-blue-700', bgColor: 'bg-blue-50' },
+  { id: 'approved', label: 'Approved', color: 'text-emerald-700', bgColor: 'bg-emerald-50' },
 ]
 
 export const onboardingStages: StageDefinition[] = [

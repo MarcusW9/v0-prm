@@ -1,7 +1,5 @@
 'use client'
 
-import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { cn } from '@/lib/utils'
 import type { Seller } from '@/lib/types/seller'
 import type { StageDefinition } from '@/lib/types/seller'
@@ -13,52 +11,32 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ stage, sellers }: KanbanColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: stage.id,
-    data: {
-      type: 'column',
-      stage,
-    },
-  })
-
-  const sellerIds = sellers.map((s) => s.id)
-
   return (
-    <div className={cn(
-      "flex w-48 flex-shrink-0 flex-col rounded-lg",
-      stage.bgColor
-    )}>
+    <div className="flex w-48 flex-shrink-0 flex-col">
       {/* Column Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-3">
-        <h3 className={cn("text-sm font-medium", stage.color)}>{stage.label}</h3>
-        <span className={cn(
-          "flex h-6 min-w-6 items-center justify-center rounded px-2 text-xs font-medium",
-          "bg-white/60",
-          stage.color
-        )}>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-medium text-slate-700">{stage.label}</h3>
+        <span className="flex h-5 min-w-5 items-center justify-center rounded bg-slate-200 px-1.5 text-xs font-medium text-slate-600">
           {sellers.length}
         </span>
       </div>
 
       {/* Column Content */}
       <div
-        ref={setNodeRef}
         className={cn(
-          'flex flex-1 flex-col gap-3 px-3 pb-3 transition-colors',
-          isOver && 'ring-2 ring-inset ring-blue-400 rounded-b-lg'
+          'flex flex-1 flex-col gap-3 rounded-lg p-3',
+          stage.bgColor
         )}
       >
-        <SortableContext items={sellerIds} strategy={verticalListSortingStrategy}>
-          {sellers.length === 0 ? (
-            <div className="flex flex-1 items-center justify-center py-8">
-              <span className="text-sm text-slate-400">Drop here</span>
-            </div>
-          ) : (
-            sellers.map((seller) => (
-              <KanbanCard key={seller.id} seller={seller} />
-            ))
-          )}
-        </SortableContext>
+        {sellers.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center py-8">
+            <span className="text-sm text-slate-400">Drop here</span>
+          </div>
+        ) : (
+          sellers.map((seller) => (
+            <KanbanCard key={seller.id} seller={seller} />
+          ))
+        )}
       </div>
     </div>
   )

@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Users,
@@ -10,7 +9,6 @@ import {
   UsersRound,
   Settings,
   ChevronUp,
-  ChevronDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -23,11 +21,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarFooter,
-  useSidebar,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -36,11 +30,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 
 const navigation = {
   overview: [
@@ -48,6 +37,7 @@ const navigation = {
   ],
   partnerManagement: [
     { name: 'All Partners', href: '/dashboard/partners', icon: Users },
+    { name: 'Pipeline', href: '/dashboard/pipeline', icon: Columns3 },
   ],
   admin: [
     { name: 'Team', href: '/dashboard/team', icon: UsersRound },
@@ -55,39 +45,14 @@ const navigation = {
   ],
 }
 
-const pipelineViews = [
-  { name: 'Acquisition', value: 'acquisition' },
-  { name: 'Onboarding', value: 'onboarding' },
-  { name: 'Account Management', value: 'account-management' },
-]
-
 export function AppSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-  const { state: sidebarState } = useSidebar()
-  const isCollapsed = sidebarState === 'collapsed'
-  const [pipelineOpen, setPipelineOpen] = useState(pathname.startsWith('/dashboard/pipeline'))
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
       return pathname === '/dashboard'
     }
     return pathname.startsWith(href)
-  }
-
-  const isPipelineActive = pathname.startsWith('/dashboard/pipeline')
-
-  const handlePipelineNavigation = (view: string) => {
-    router.push(`/dashboard/pipeline?view=${view}`)
-  }
-
-  // When collapsed, clicking Pipeline icon navigates to default (Acquisition)
-  const handlePipelineClick = () => {
-    if (isCollapsed) {
-      router.push('/dashboard/pipeline?view=acquisition')
-    } else {
-      setPipelineOpen(!pipelineOpen)
-    }
   }
 
   return (
@@ -154,44 +119,6 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              
-              {/* Pipeline with expandable sub-menu */}
-              <Collapsible open={pipelineOpen && !isCollapsed} onOpenChange={setPipelineOpen}>
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      onClick={handlePipelineClick}
-                      className={cn(
-                        'text-slate-300 hover:bg-slate-700 hover:text-white w-full',
-                        isPipelineActive && 'bg-slate-700 text-white'
-                      )}
-                    >
-                      <Columns3 className="h-4 w-4" />
-                      <span className="flex-1">Pipeline</span>
-                      {!isCollapsed && (
-                        <ChevronDown className={cn(
-                          "h-4 w-4 transition-transform duration-200",
-                          pipelineOpen && "rotate-180"
-                        )} />
-                      )}
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {pipelineViews.map((view) => (
-                        <SidebarMenuSubItem key={view.value}>
-                          <SidebarMenuSubButton
-                            onClick={() => handlePipelineNavigation(view.value)}
-                            className="text-slate-400 hover:bg-slate-700 hover:text-white cursor-pointer"
-                          >
-                            <span>{view.name}</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -224,10 +151,10 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="bg-slate-800 p-4 group-data-[collapsible=icon]:p-2">
+      <SidebarFooter className="bg-slate-800 p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left hover:bg-slate-700 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2">
+            <button className="flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left hover:bg-slate-700">
               <Avatar className="h-8 w-8 flex-shrink-0 bg-teal-600">
                 <AvatarFallback className="bg-teal-600 text-xs text-white">
                   T
